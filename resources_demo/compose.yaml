@@ -1,0 +1,19 @@
+
+version: '3'
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - ./postgresql-data/:/var/lib/postgresql/data/:rw
+    ports:
+      - 6007:5432
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_user
+      POSTGRES_DB: test_db
+      PGDATA: /var/lib/postgresql/data
+    networks:
+      - network_2
+
+networks:
+  network_2:
