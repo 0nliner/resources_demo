@@ -33,3 +33,7 @@ class UpdateNodesDTO(BaseModel):
 
 class ListNodesDTO(BaseModel):
     caller: CallerDTO
+
+
+class UploadImageDTO(BaseModel):
+    ...

@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package example;
+
+// Определение объекта, над которым будут выполняться операции
+message TreeNode {
+  int32 id = 1; // Уникальный идентификатор объекта
+  string name = 2; // Некоторые данные объекта, например, имя
+  // Добавьте здесь другие поля в соответствии с вашими требованиями
+}
+
+// Запрос на создание объекта
+message CreateTreeNodeRequest {
+  string name = 1; // Данные для создания объекта
+  // Добавьте здесь другие поля, если это необходимо
+}
+
+// Ответ на создание объекта
+message CreateTreeNodeResponse {
+  TreeNode object = 1; // Созданный объект
+}
+
+// Запрос на получение объекта по ID
+message GetTreeNodeRequest {
+  int32 id = 1; // ID объекта для получения
+}
+
+// Ответ на получение объекта
+message GetTreeNodeResponse {
+  TreeNode object = 1; // Запрашиваемый объект
+}
+
+// Запрос на удаление объекта
+message DeleteTreeNodeRequest {
+  int32 id = 1; // ID объекта для удаления
+}
+
+// Ответ на удаление объекта
+message DeleteTreeNodeResponse {
+  string message = 1; // Сообщение о результате операции
+}
+
+// Запрос на обновление объекта
+message UpdateTreeNodeRequest {
+  int32 id = 1; // ID объекта для обновления
+  string name = 2; // Новые данные для объекта
+  // Добавьте здесь другие поля, если это необходимо
+}
+
+// Ответ на обновление объекта
+message UpdateTreeNodeResponse {
+  TreeNode object = 1; // Обновленный объект
+}
+
+// Запрос на получение списка объектов
+message ListTreeNodesRequest {
+  int32 limit = 1; // Максимальное количество возвращаемых объектов
+}
+
+// Ответ на получение списка объектов
+message ListTreeNodesResponse {
+  repeated TreeNode objects = 1; // Список объектов
+}
+
+// Сервис, предоставляющий операции над объектами
+service TreeNodeService {
+  rpc CreateTreeNode(CreateTreeNodeRequest) returns (CreateTreeNodeResponse);
+  rpc GetTreeNode(GetTreeNodeRequest) returns (GetTreeNodeResponse);
+  rpc DeleteTreeNode(DeleteTreeNodeRequest) returns (DeleteTreeNodeResponse);
+  rpc UpdateTreeNode(UpdateTreeNodeRequest) returns (UpdateTreeNodeResponse);
+  rpc ListTreeNodes(ListTreeNodesRequest) returns (ListTreeNodesResponse);
+}

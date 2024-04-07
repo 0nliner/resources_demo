@@ -11,3 +11,11 @@ class NodeDM(BaseModel):
 
     id: int
     parent_id: Optional[int]
+
+
+class ImageDM(BaseModel):
+    id: str
+
+    @property
+    def url(self) -> str:
+        ...

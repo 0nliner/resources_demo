@@ -5,9 +5,10 @@ from .dtos import (ListNodesDTO,
                    CreateNodeDTO,
                    RetrieveNodeDTO,
                    UpdateNodeDTO,
-                   DeleteNodeDTO)
+                   DeleteNodeDTO,
+                   UploadImageDTO)
 from .models import Node
-from .datamappers import NodesDM, NodeDM
+from .datamappers import NodesDM, NodeDM, ImageDM
 from .interfaces import NodesRepoABC
 from lib.interfaces import RepoMixins
 
@@ -24,3 +25,5 @@ class NodesRepo(NodesRepoABC,
     async def list(self, data: ListNodesDTO) -> NodesDM:
         ...
 
+    async def upload_image(self, data: UploadImageDTO) -> ImageDM:
+        ...
