@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from archtool.dependecy_injector import DependecyInjector
 
-sys.path.insert(0, (pathlib.Path.cwd().parent).as_posix())
+sys.path.insert(0, "/home/merlin/code/resources/resources_demo/project")
 sys.path.insert(0, "")
 
 from app import init
@@ -32,8 +32,8 @@ def pytest_sessionfinish(session, exitstatus):
 
 
 @fixture(scope="module")
-def injector():
-    injector = init()
+def injector(event_loop):
+    injector = init(loop=event_loop)
     return injector
 
 

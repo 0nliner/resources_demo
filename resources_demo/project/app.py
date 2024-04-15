@@ -1,21 +1,20 @@
 import asyncio
+from aiohttp import web
+import aiobotocore.session
 from archtool.dependecy_injector import DependecyInjector
 from archtool.global_types import AppModule
 
+import aiobotocore
 from keycloak import KeycloakAdmin, KeycloakOpenID
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from core import Base
 from utils import create_tables
+from lib.interfaces import ArchtoolsAPIGenerator, ArchtoolsOpenApiGenerator
 
 import settings
 
-
-
-
-import asyncio
-import aiobotocore
 
 # 
 # async def upload_file_to_s3():
@@ -41,11 +40,6 @@ def init_deps(injector: DependecyInjector):
     регистрируем необходимые зависимости
     """
     # TODO: сделать автопоиск зависимостей по модулям
-    session = aiobotocore.get_session()
-    s3_client = session.create_client('s3',
-                                      region_name=settings.REGION_NAME,
-                                      aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                      aws_access_key_id=settings.AWS_ACCESS_KEY_ID)
     engine = create_async_engine(settings.DB_URL, echo=True)
     session_maker = sessionmaker(bind=engine,
                                  class_=AsyncSession,
@@ -53,7 +47,7 @@ def init_deps(injector: DependecyInjector):
 
     injector._reg_dependecy(AsyncEngine, engine)
     injector._reg_dependecy(sessionmaker[AsyncSession], session_maker)
-
+    # keycloak
     keycloak_data = dict(
         server_url=f"{settings.KC_HOSTNAME}:{settings.KC_PORT}/",
         client_id="backend",
@@ -69,31 +63,50 @@ def init_deps(injector: DependecyInjector):
                             client_secret_key="iS3RfjlGdRljf1RBnspilzNf7TZxygAO")
     injector._reg_dependecy(KeycloakOpenID, KeycloakOpenID(**keycloak_data))
     injector._reg_dependecy(KeycloakAdmin, KeycloakAdmin(**keycloak_admin_data))
+    # s3
+    s3_session = aiobotocore.session.get_session()
+    s3_client = s3_session.create_client('s3',
+                                         region_name=settings.REGION_NAME,
+                                         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                         aws_access_key_id=settings.AWS_ACCESS_KEY_ID)
+    injector._reg_dependecy(aiobotocore.session.AioSession, s3_session)
+    injector._reg_dependecy(aiobotocore.session.ClientCreatorContext, s3_client)
 
+import pathlib
 
-
-def init():
+def init(loop, run: bool = False):
     import sys
-    sys.path.insert(0, "")
+    # sys.path.insert(0, "")
     loop = asyncio.get_event_loop()
     modules = [AppModule("resources"),
-               AppModule("users")]
+               AppModule("users"),
+               AppModule("devices")]
 
     injector = DependecyInjector(modules_list=modules)
-    init_deps()
+    init_deps(injector)
     # for dep in deps:
     #     injector.reg_dependecy(dep.serialize())
     injector.inject()
+    api_generator = ArchtoolsAPIGenerator(injector)
     
-    # 
+    app = api_generator.aiohttp_app(loop=loop)
+    openapi_generator = ArchtoolsOpenApiGenerator(injector=injector)
+    openapi_generator.generate_openapi(dest_folder=pathlib.Path.cwd() / "openapi")
+
     tasks = (
         create_tables(engine=injector.get_dependency(AsyncEngine), base=Base),
     )
-    
+    # tasks.append(web.run_app(app))
+
     for task in tasks:
         loop.run_until_complete(task)
-    return injector
+    return injector, app
 
 
 if __name__ == "__main__":
-    injector = init()
+    EVENT_LOOP_POLICY = asyncio.get_event_loop_policy()
+    EVENT_LOOP = asyncio.new_event_loop()
+    EVENT_LOOP_POLICY.set_event_loop(EVENT_LOOP)
+
+    injector, app = init(run=True, loop=EVENT_LOOP)
+    web.run_app(app, port=8083, loop=EVENT_LOOP)

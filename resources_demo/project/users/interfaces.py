@@ -12,9 +12,9 @@ class UsersControllerABC(ABCController):
     async def create_user(self, data: CreateUserDTO) -> UserDM:
         ...
 
-    @abstractmethod
-    async def list_users(self, data) -> list[UserDM]:
-        ...
+    # @abstractmethod
+    # async def list_users(self, data) -> list[UserDM]:
+    #     ...
 
 
 class SSORepoABC(ABCRepo):

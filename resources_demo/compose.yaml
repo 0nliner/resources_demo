@@ -20,11 +20,15 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - "9000:9000"
+      - 9000:9000
+      - 9001:9001
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-    command: server /data
+      CONSOLE_ACCESS_KEY: test
+      CONSOLE_SECRET_KEY: test
+    # command: server /data
+    command: server --address ":9000" --console-address ":9001" /data
 
 volumes:
   minio_data:

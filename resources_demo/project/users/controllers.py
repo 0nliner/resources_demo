@@ -17,5 +17,5 @@ class UserController(UsersControllerABC):
                          inner_user_data=new_inner_user)
         return user_dm
 
-    async def list_users(self, data) -> list[UserDM]:
-        ...
+    # async def list_users(self, data) -> list[UserDM]:
+    #     ...

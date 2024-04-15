@@ -1,14 +1,13 @@
 import typing
 
-from .interfaces import NodesControllerABC, APIController
+from .interfaces import NodesControllerABC
 from .dtos import CreateNodesDTO, UpdateNodesDTO, DeleteNodesDTO, ListNodesDTO
 from .datamappers import NodesDM
 
 from users.interfaces import UserRepoABC
-from lib.interfaces import BaseAPIController
 
 
-class NodesController(NodesControllerABC, BaseAPIController):
+class NodesController(NodesControllerABC):
     user_repo: UserRepoABC
 
     async def create_multiple(self, data: CreateNodesDTO) -> NodesDM:
