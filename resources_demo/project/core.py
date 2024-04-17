@@ -11,7 +11,7 @@ Base = declarative_base()
 
 
 class CallerDTO(SSOUserDM, BaseModel):
-    ...
+    role_id: int
 
 
 class ReportFormats(Enum):

@@ -73,6 +73,15 @@ def init_deps(injector: DependecyInjector):
     injector._reg_dependecy(aiobotocore.session.ClientCreatorContext, s3_client)
 
 import pathlib
+from accesses.interfaces import AccessServiceABC
+from core import CallerDTO
+
+
+def policies_authorization(injector: DependecyInjector):
+    def wrapped(caller: CallerDTO, request):
+        access_service = injector.get_dependency(AccessServiceABC)
+    return wrapped
+
 
 def init(loop, run: bool = False):
     import sys
@@ -80,23 +89,24 @@ def init(loop, run: bool = False):
     loop = asyncio.get_event_loop()
     modules = [AppModule("resources"),
                AppModule("users"),
+               AppModule("accesses"),
                AppModule("devices")]
 
     injector = DependecyInjector(modules_list=modules)
     init_deps(injector)
-    # for dep in deps:
-    #     injector.reg_dependecy(dep.serialize())
+
     injector.inject()
-    api_generator = ArchtoolsAPIGenerator(injector)
+    api_generator = ArchtoolsAPIGenerator(injector,
+                                          custom_midlewares=[policies_authorization(injector=injector)])
     
     app = api_generator.aiohttp_app(loop=loop)
+    app._middlewares.append()
     openapi_generator = ArchtoolsOpenApiGenerator(injector=injector)
     openapi_generator.generate_openapi(dest_folder=pathlib.Path.cwd() / "openapi")
 
     tasks = (
         create_tables(engine=injector.get_dependency(AsyncEngine), base=Base),
     )
-    # tasks.append(web.run_app(app))
 
     for task in tasks:
         loop.run_until_complete(task)

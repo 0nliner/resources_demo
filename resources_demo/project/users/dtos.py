@@ -7,7 +7,8 @@ class CreateInnerUserDTO(BaseModel):
 
 
 class RetrieveInnerUserDTO(BaseModel):
-    ...
+    role_id: int
+    role: str
 
 
 class UpdateInnerUserDTO(BaseModel):

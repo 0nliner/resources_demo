@@ -1,15 +1,15 @@
 import datetime
 from typing import Optional
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from core import CallerDTO, ReportFormats
 
 
 class CreateNodeDTO(BaseModel):
-    parent_id: Optional[int] = None
+    parent_id: Optional[int] = Field(default_factory=None)
 
 
 class DeleteNodeDTO(BaseModel):
-    ...
+    id: Optional[int] = Field(default_factory=None)
 
 
 class UpdateNodeDTO(BaseModel):

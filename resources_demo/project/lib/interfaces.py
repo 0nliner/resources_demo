@@ -525,6 +525,14 @@ class OpenApiEndpoint:
 from pydantic.fields import FieldInfo
 from pydantic._internal._model_construction import ModelMetaclass
 
+# немного хардкода с аннотированием возвращаемого значения
+def get_dto_and_dm(self, method: typing.Callable) -> tuple[BaseModel, BaseModel]:
+    annotations = method.__annotations__
+    dto_cls = [v for k, v in annotations.items() if k != 'return'][0]
+    dm_cls = annotations.get('return', None)
+    return dto_cls, dm_cls
+
+
 class ArchtoolsOpenApiGenerator:
     DTO_BASE = BaseModel
     TYPES_MAPPING = {
@@ -541,13 +549,6 @@ class ArchtoolsOpenApiGenerator:
         self.dms = {}
         self.uri_prefix = uri_prefix
         self._process_after = {}
-
-    # немного хардкода с аннотированием возвращаемого значения
-    def get_dto_and_dm(self, method: typing.Callable) -> tuple[BaseModel, BaseModel]:
-        annotations = method.__annotations__
-        dto_cls = [v for k, v in annotations.items() if k != 'return'][0]
-        dm_cls = annotations.get('return', None)
-        return dto_cls, dm_cls
 
     def generate_openapi_model(self, model: BaseModel) -> str:
         fields = model.model_fields
@@ -605,7 +606,7 @@ class ArchtoolsOpenApiGenerator:
                 is_method_detailed = resolve_endpoint_detailed(method, method_type=method_type)
                 uri = resolve_uri(method=method, controller=controller, method_type=method_type)
 
-                dto, dm = self.get_dto_and_dm(method)
+                dto, dm = get_dto_and_dm(method)
                 if dto not in self.dtos:
                     dto_code = self.generate_openapi_model(dto)
                     self.dtos.update({dto: dto_code})
