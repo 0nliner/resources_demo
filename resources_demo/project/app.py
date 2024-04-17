@@ -1,3 +1,5 @@
+import typing
+
 import asyncio
 from aiohttp import web
 import aiobotocore.session
@@ -75,12 +77,28 @@ def init_deps(injector: DependecyInjector):
 import pathlib
 from accesses.interfaces import AccessServiceABC
 from core import CallerDTO
+from lib.interfaces import DTO_T
 
 
+class PermissionError(Exception):
+    ...
+
+
+# TODO: вынести в мидлверы
 def policies_authorization(injector: DependecyInjector):
-    def wrapped(caller: CallerDTO, request):
-        access_service = injector.get_dependency(AccessServiceABC)
-    return wrapped
+    def controller_method_wrapper(method: typing.Callable):
+        async def wrapped(caller: CallerDTO, data: DTO_T):
+            access_service: AccessServiceABC = injector.get_dependency(AccessServiceABC)
+            controller = method.__class__
+            is_accesible = access_service.is_accesible(action=method, caller=caller, controller=controller)
+            if is_accesible:
+                result = await method(caller=caller, data=data)
+                return result
+            else:
+                # возвращаем permission error
+                raise PermissionError()
+        return wrapped
+    return controller_method_wrapper
 
 
 def init(loop, run: bool = False):
@@ -97,12 +115,12 @@ def init(loop, run: bool = False):
 
     injector.inject()
     api_generator = ArchtoolsAPIGenerator(injector,
-                                          custom_midlewares=[policies_authorization(injector=injector)])
+                                          custom_middlewares=[policies_authorization(injector=injector)])
     
     app = api_generator.aiohttp_app(loop=loop)
-    app._middlewares.append()
-    openapi_generator = ArchtoolsOpenApiGenerator(injector=injector)
-    openapi_generator.generate_openapi(dest_folder=pathlib.Path.cwd() / "openapi")
+    # TODO
+    # openapi_generator = ArchtoolsOpenApiGenerator(injector=injector)
+    # openapi_generator.generate_openapi(dest_folder=pathlib.Path.cwd() / "openapi")
 
     tasks = (
         create_tables(engine=injector.get_dependency(AsyncEngine), base=Base),

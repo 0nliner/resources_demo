@@ -445,10 +445,14 @@ def wrap_method_as_endpoint(method: typing.Callable, method_type: 'RequestTypes'
     return wrapper
 
 
+from functools import reduce
+
+
 class ArchtoolsAPIGenerator:
-    def __init__(self, injector: DependecyInjector, uri_prefix: str = "/api/"):
+    def __init__(self, injector: DependecyInjector, uri_prefix: str = "/api/", custom_middlewares=[]):
         self.injector = injector
         self.uri_prefix = uri_prefix
+        self.custom_middlewares = custom_middlewares
 
     def aiohttp_app(self, loop) -> web_app.Application:
         http_app = web_app.Application(loop=loop)
@@ -460,7 +464,11 @@ class ArchtoolsAPIGenerator:
                                                     controller=controller,
                                                     method_type=method_type)
                 router_method = getattr(http_app.router, f"add_{method_type.value}")
-                # регистрируем роут
+                # оборачиваем метод в мидлвары
+                # TODO: норм работает ?
+                result = reduce(lambda o, m: m(o), self.custom_middlewares, method)
+                method = method
+                # оборачиваем в эндпоинт и регистрируем роут
                 endpoint = wrap_method_as_endpoint(method, method_type=method_type)
                 router_method(uri, endpoint)
         return http_app
@@ -526,7 +534,7 @@ from pydantic.fields import FieldInfo
 from pydantic._internal._model_construction import ModelMetaclass
 
 # немного хардкода с аннотированием возвращаемого значения
-def get_dto_and_dm(self, method: typing.Callable) -> tuple[BaseModel, BaseModel]:
+def get_dto_and_dm(method: typing.Callable) -> tuple[BaseModel, BaseModel]:
     annotations = method.__annotations__
     dto_cls = [v for k, v in annotations.items() if k != 'return'][0]
     dm_cls = annotations.get('return', None)

@@ -1,4 +1,4 @@
-from project.lib.interfaces import ServiceMixins
+from lib.interfaces import ServiceMixins
 from .datamappers import InnerUserDM
 from .dtos import (CreateInnerUserDTO,
                    RetrieveInnerUserDTO,

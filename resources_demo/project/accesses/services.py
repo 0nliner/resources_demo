@@ -25,7 +25,7 @@ class AccessService(AccessServiceABC):
         """
         action - метод контроллера
         """
-        # делаем проверку по полям dto
+        # TODO: делаем проверку по полям dto
         dto, datamapper = get_dto_and_dm(action)
         self.get_roles_for_dto()
         context = AccessContext(caller=caller, dto=dto)
@@ -44,6 +44,10 @@ class AccessService(AccessServiceABC):
         return True
 
     async def get_roles_for_dto(self, model_name: str):
+        """
+        скорее всего будет ходить в бэк, в котором описаны роли под дто,
+        хотя сам механизм ролей является неполным механизмом авторизации
+        """
         ...
 
     # -----------------------------------------------------------------------------------------
