@@ -89,8 +89,9 @@ def policies_authorization(injector: DependecyInjector):
     def controller_method_wrapper(method: typing.Callable):
         async def wrapped(caller: CallerDTO, data: DTO_T):
             access_service: AccessServiceABC = injector.get_dependency(AccessServiceABC)
+            # TODO: стоит убрать контроллер
             controller = method.__class__
-            is_accesible = access_service.is_accesible(action=method, caller=caller, controller=controller)
+            is_accesible = await access_service.is_accesible(action=method, caller=caller)
             if is_accesible:
                 result = await method(caller=caller, data=data)
                 return result
@@ -101,9 +102,9 @@ def policies_authorization(injector: DependecyInjector):
     return controller_method_wrapper
 
 
-def init(loop, run: bool = False):
+def init(loop):
     import sys
-    # sys.path.insert(0, "")
+    sys.path.insert(0, (pathlib.Path.cwd() / "project").as_posix())
     loop = asyncio.get_event_loop()
     modules = [AppModule("resources"),
                AppModule("users"),
@@ -114,21 +115,26 @@ def init(loop, run: bool = False):
     init_deps(injector)
 
     injector.inject()
-    api_generator = ArchtoolsAPIGenerator(injector,
-                                          custom_middlewares=[policies_authorization(injector=injector)])
-    
-    app = api_generator.aiohttp_app(loop=loop)
-    # TODO
-    # openapi_generator = ArchtoolsOpenApiGenerator(injector=injector)
-    # openapi_generator.generate_openapi(dest_folder=pathlib.Path.cwd() / "openapi")
-
     tasks = (
         create_tables(engine=injector.get_dependency(AsyncEngine), base=Base),
     )
 
     for task in tasks:
         loop.run_until_complete(task)
-    return injector, app
+    return injector
+
+
+def init_http_api(injector: DependecyInjector, loop):
+    # TODO
+    # openapi_generator = ArchtoolsOpenApiGenerator(injector=injector)
+    # openapi_generator.generate_openapi(dest_folder=pathlib.Path.cwd() / "openapi")
+
+    api_generator = ArchtoolsAPIGenerator(injector,
+                                          custom_middlewares=[policies_authorization(injector=injector)])
+    
+    app = api_generator.aiohttp_app(loop=loop)
+    return app
+
 
 
 if __name__ == "__main__":
@@ -136,5 +142,6 @@ if __name__ == "__main__":
     EVENT_LOOP = asyncio.new_event_loop()
     EVENT_LOOP_POLICY.set_event_loop(EVENT_LOOP)
 
-    injector, app = init(run=True, loop=EVENT_LOOP)
+    injector = init(loop=EVENT_LOOP)
+    app = init_http_api(injector=injector, loop=EVENT_LOOP)
     web.run_app(app, port=8083, loop=EVENT_LOOP)

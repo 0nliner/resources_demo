@@ -7,8 +7,9 @@ class CreateInnerUserDTO(BaseModel):
 
 
 class RetrieveInnerUserDTO(BaseModel):
-    role_id: int
-    role: str
+    id: Optional[int] = None
+    role_id: Optional[int] = None
+    role: Optional[str] = None
 
 
 class UpdateInnerUserDTO(BaseModel):

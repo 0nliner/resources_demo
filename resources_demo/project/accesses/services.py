@@ -20,20 +20,27 @@ class AccessService(AccessServiceABC):
 
     async def is_accesible(self,
                            caller: CallerDTO,
-                           controller: ABCController,
                            action: typing.Callable) -> bool:
         """
         action - метод контроллера
         """
-        # TODO: делаем проверку по полям dto
         dto, datamapper = get_dto_and_dm(action)
-        self.get_roles_for_dto()
-        context = AccessContext(caller=caller, dto=dto)
 
+        controller: ABCController = None
+        if hasattr(action, "__self__"):
+            controller = type(action.__self__)
+        else:
+            controller = action.__class__
+
+        # TODO: делаем проверку по полям dto
+        # self.get_roles_for_dto()
+        context = AccessContext(caller=caller, dto=dto)
+        # TODO: нужно получить инфу о политиках на контроллер, затем их проитерировать
         for policy in POLICES:
-            polisy_decision = await self.is_policy_allows(policy=policy, context=context)
-            if not polisy_decision:
+            poliсy_decision = await self.is_policy_allows(policy=policy, context=context)
+            if not poliсy_decision:
                 return False
+        return True
 
     async def is_policy_allows(self,
                                policy,

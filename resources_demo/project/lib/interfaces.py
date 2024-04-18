@@ -378,28 +378,34 @@ def find_method_origin(cls, method_name):
             return base_class
     return None
 
-def get_first_arg_type_of_method(cls, method_name: str):
+def get_arg_type_of_method_by_index(cls, method_name: str, index: int):
     method = getattr(cls, method_name)
     type_hints = typing.get_type_hints(method)
-    first_param_name = list(type_hints.keys())[0]
+    first_param_name = list(type_hints.keys())[index]
     return type_hints[first_param_name]
 
 
 def wrap_method_as_endpoint(method: typing.Callable, method_type: 'RequestTypes'):
-    # чернуха
-    original_class = find_method_origin(type(method.__self__), method.__name__)
-    is_generic_method = original_class is ControllerMixins
+    # делаем инъекцию на основе аннотаций
+    is_wrapped = False
+    extra_payload_required = {}
+    if hasattr(method, "__original__"):
+        if "caller" in method.__annotations__:
+            extra_payload_required.update({"caller": method.__annotations__["caller"]})
+        wrapper = method 
+        method = method.__original__
+        is_wrapped = True
     
-    if not is_generic_method:
-        method_dto: BaseModel = method.__annotations__["data"]
-    else:
-        # единственный найденый вариант
-        # TODO: порнография, нужно оптимизировать
-        generic_typevar = get_first_arg_type_of_method(type(method.__self__), method.__name__)
-        dto_index = original_class.__orig_bases__[0].__args__.index(generic_typevar)
-        method_dto: BaseModel = method.__self__.__orig_bases__[1].__args__[dto_index]
+    function_to_call = wrapper if is_wrapped else method
+    method_dto, method_dm = get_dto_and_dm(method=method)
 
-    # менее чернуха
+    hardcoded_caller_data = dict(id=1,
+                                 phone_number="+78005553555",
+                                 username="chel",
+                                 email="bebra@gmail.com",
+                                 role_id=1)
+
+    # TODO: хотелось бы как-то подрефакторить
     if method_type is RequestTypes.PATCH:
         async def wrapper(request: AIOHTTP_REQUEST) -> AIOHTTP_RESPONSE:
             if request.has_body:
@@ -408,34 +414,62 @@ def wrap_method_as_endpoint(method: typing.Callable, method_type: 'RequestTypes'
                 body = await request.json()
                 payload = payload_class(**body)
                 dto = method_dto(dict(**request.query, payload=payload))
-                result = await method(dto)
+
+                extra_payload = {}
+                if "caller" in extra_payload_required:
+                    caller_dto = extra_payload_required["caller"]
+                    # TODO: где-то нужно пришить механизм аутендификации, сейчас хардкод
+                    caller_instanse = caller_dto.model_validate(hardcoded_caller_data)
+                    extra_payload.update(dict(caller=caller_instanse))
+                result = await function_to_call(data=dto, **extra_payload)
+
                 if type(result) is BaseModel:
                     serialized_result = result.model_dumps()
                 # TODO: отправка ответа
                 return web.json_response(data=serialized_result,
                                          status=200,
                                          dumps=json_encoder)
+
     elif method_type in [RequestTypes.GET, RequestTypes.DELETE]:
         status_code = {RequestTypes.GET: "200", RequestTypes.DELETE: "204"}[method_type]
         
         async def wrapper(request: AIOHTTP_REQUEST) -> AIOHTTP_RESPONSE:
             raw_data = request.query
             dto = method_dto.model_validate({**request.query, **dict(request.match_info)})
-            result = await method(dto)
+            # TODO: самоповтор
+            extra_payload = {}
+            if "caller" in extra_payload_required:
+                caller_dto: BaseModel = extra_payload_required["caller"]
+                # TODO: где-то нужно пришить механизм аутендификации, сейчас хардкод
+                caller_instanse = caller_dto.model_validate(hardcoded_caller_data)
+                extra_payload.update(dict(caller=caller_instanse))
+            result = await function_to_call(data=dto, **extra_payload)
+
             if type(result) is BaseModel:
                 serialized_result = result.model_dumps()
             else:
                 serialized_result = result
-            return web.json_response(data=status_code,
-                                     status=200,
+            return web.json_response(data=serialized_result,
+                                     status=status_code,
                                      dumps=json_encoder)
+
     elif method_type in [RequestTypes.POST]:
         async def wrapper(request: AIOHTTP_REQUEST) -> AIOHTTP_RESPONSE:
             body = await request.json()
             dto = method_dto(dict(**request.body))
-            result = await method(dto)
+
+            extra_payload = {}
+            if "caller" in extra_payload_required:
+                caller_dto = extra_payload_required["caller"]
+                # TODO: где-то нужно пришить механизм аутендификации, сейчас хардкод
+                caller_instanse = caller_dto.model_validate(hardcoded_caller_data)
+                extra_payload.update(dict(caller=caller_instanse))
+            result = await function_to_call(data=dto, **extra_payload)
+
             if type(result) is BaseModel:
                 serialized_result = result.model_dumps()
+            else:
+                serialized_result = result
             # TODO: отправка ответа
             return web.json_response(data=serialized_result,
                                      status=200,
@@ -466,8 +500,9 @@ class ArchtoolsAPIGenerator:
                 router_method = getattr(http_app.router, f"add_{method_type.value}")
                 # оборачиваем метод в мидлвары
                 # TODO: норм работает ?
-                result = reduce(lambda o, m: m(o), self.custom_middlewares, method)
-                method = method
+                original_method = method
+                method = reduce(lambda o, m: m(o), self.custom_middlewares, method)
+                method.__original__ = original_method
                 # оборачиваем в эндпоинт и регистрируем роут
                 endpoint = wrap_method_as_endpoint(method, method_type=method_type)
                 router_method(uri, endpoint)
@@ -533,12 +568,26 @@ class OpenApiEndpoint:
 from pydantic.fields import FieldInfo
 from pydantic._internal._model_construction import ModelMetaclass
 
+
 # немного хардкода с аннотированием возвращаемого значения
 def get_dto_and_dm(method: typing.Callable) -> tuple[BaseModel, BaseModel]:
-    annotations = method.__annotations__
-    dto_cls = [v for k, v in annotations.items() if k != 'return'][0]
-    dm_cls = annotations.get('return', None)
-    return dto_cls, dm_cls
+    original_class = find_method_origin(type(method.__self__), method.__name__)
+    is_generic_method = original_class is ControllerMixins
+    
+    if not is_generic_method:
+        method_dto: BaseModel = method.__annotations__["data"]
+        annotations = method.__annotations__
+        # dto_cls = [v for k, v in annotations.items() if k != 'return'][0]
+        dm_cls = annotations.get('return', None)
+        return method_dto, dm_cls
+    else:
+        # единственный найденый вариант
+        # TODO: порнография, нужно оптимизировать
+        generic_typevar = get_arg_type_of_method_by_index(type(method.__self__), method.__name__, 0)
+        dto_index = original_class.__orig_bases__[0].__args__.index(generic_typevar)
+        method_dto: BaseModel = method.__self__.__orig_bases__[1].__args__[dto_index]
+        method_dm: BaseModel = method.__self__.__orig_bases__[1].__args__[0]
+        return method_dto, method_dm
 
 
 class ArchtoolsOpenApiGenerator:

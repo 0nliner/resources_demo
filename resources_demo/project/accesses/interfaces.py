@@ -14,7 +14,6 @@ class AccessServiceABC(ABCService):
     @abstractmethod
     async def is_accesible(self,
                            caller: CallerDTO,
-                           controller: ABCController,
                            action: typing.Callable) -> bool:
         ...
 

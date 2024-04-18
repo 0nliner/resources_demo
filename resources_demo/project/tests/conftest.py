@@ -8,11 +8,12 @@ import pathlib
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 from archtool.dependecy_injector import DependecyInjector
+# from aiohttp.test_utils import 
 
 sys.path.insert(0, "/home/merlin/code/resources/resources_demo/project")
 sys.path.insert(0, "")
 
-from app import init
+from app import init, init_http_api
 from resources.interfaces import NodesRepoABC
 from resources.dtos import CreateNodeDTO
 
@@ -35,6 +36,16 @@ def pytest_sessionfinish(session, exitstatus):
 def injector(event_loop):
     injector = init(loop=event_loop)
     return injector
+
+@fixture(scope="module")
+def aiohttp_app(event_loop, injector):
+    app = init_http_api(loop=event_loop, injector=injector)
+    return app
+
+
+@pytest.fixture
+def api_client(event_loop, aiohttp_client, aiohttp_app):
+    return event_loop.run_until_complete(aiohttp_client(aiohttp_app))
 
 
 # TODO: думаю лучше записывать сессию в contextvar, сессию брать оттуда же
