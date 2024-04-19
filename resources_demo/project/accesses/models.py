@@ -1,12 +1,13 @@
 # скорее всего будет отдельным сервисом
-from sqlalchemy import JSON
+from sqlalchemy import JSON, ARRAY, String
 from sqlalchemy.orm import Mapped, mapped_column
 from core import Base
 
 
 class Policy(Base):
-    __table_name__ = "polices"
+    __tablename__ = "polices"
     
-    id: Mapped[int]
+    id: Mapped[int] = mapped_column(primary_key=True)
     policy_on: Mapped[str]
-    policy: Mapped[JSON] = mapped_column(nullable=True)
+    policy: Mapped[dict] = mapped_column(JSON, nullable=True)
+    conditions: Mapped[list[str]] = mapped_column(ARRAY(String(100)))

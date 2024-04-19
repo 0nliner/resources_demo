@@ -3,14 +3,16 @@ from contextlib import asynccontextmanager
 import typing
 from functools import wraps
 
+from multimethod import multimethod
 from sqlalchemy import select, update, delete, BinaryExpression, Selectable
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from archtool.layers.default_layer_interfaces import ABCController
 from archtool.dependecy_injector import DependecyInjector
 
 from exceptions import NotExist
+from pydantic import TypeAdapter
 
 
 TT = typing.TypeVar("TT", bound=BaseModel)
@@ -46,8 +48,32 @@ G_DM_T = typing.TypeVar("G_DM_T", bound=DM_T)
 P = typing.ParamSpec('P')
 T = typing.TypeVar("T")
 
+# для dto
+class Blank(type):
+    ...
+
+
+T = typing.TypeVar("T")
+DTOField = typing.Union[typing.Optional[T], Blank]
+
+
+class DTOBase(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+class DMBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PaginationInfo(BaseModel):
+    get_all: bool = False
+    default_chunk_size: int = 100
+    chunk_size: typing.Optional[int]
+    page_start: int = 0
+
 
 class FilterDTOABC(ABC):
+    # filter_by_conditions = 
+    # paginagion_info: PaginationInfo
     ...
 
 
@@ -55,6 +81,8 @@ def build_where_expr(data: FilterDTOABC, selectable: Selectable) -> typing.Optio
     # пока простой пример
     expression: typing.Optional[BinaryExpression] = None
     for key, val in vars(data).items():
+        if val is Blank:
+            continue
         attr = getattr(selectable, key)
         expression = expression and (attr == val) if expression else (attr == val)
     return expression
@@ -78,6 +106,13 @@ class RepoMixinsABC(ABC, typing.Generic[TT, CT, RT, UT, DT]):
 
     @abstractmethod
     async def delete(self, data: DT, session: typing.Optional[AsyncSession] = None) -> None:
+        ...
+
+    @abstractmethod
+    async def filter(self,
+                     data: FilterDTOABC,
+                     session: typing.Optional[AsyncSession] = None
+                     ) -> TypeAdapter[list[TT]]:
         ...
 
 
@@ -160,6 +195,24 @@ class RepoMixins(RepoMixinsABC[TT, CT, RT, UT, DT]):
         query = delete(self.model).where(where_expr)
         async with self.get_or_create_session(session) as session:
             await session.execute(query)
+
+    @asynccontextmanager
+    async def filter(self,
+                     data: FilterDTOABC,
+                     session: typing.Optional[AsyncSession] = None
+                     ) -> typing.AsyncIterator[TypeAdapter[list[TT]]]:
+
+        # TODO:
+        where_expression: BinaryExpression = build_where_expr(data.selection_expr)
+        query = select(self.model).where(data.filter_by_conditions)
+        object_list_type = TypeAdapter[list[TT]]
+
+        async with self.get_or_create_session(session) as session:
+            conn = await session.execute(query)
+            orm_result = conn.mappings().all()
+            result = object_list_type.validate_python(orm_result)
+            yield result
+
 
 
 """
@@ -312,8 +365,22 @@ def get_controller_methods(controller: ABCController) -> dict[str, typing.Callab
             methods.update({key: value})
     return methods
 
-def resolve_controller_name(name: str) -> str:
-    return snake_case(name.replace("Controller", ""))
+
+@multimethod
+def resolve_controller_name(controller) -> str:
+    ...
+
+
+@resolve_controller_name.register
+def _(controller: typing.Type[ABCController]) -> str:
+    python_controller_name = controller.__name__
+    return snake_case(python_controller_name.replace("Controller", ""))
+
+
+@resolve_controller_name.register
+def _(controller: ABCController) -> str:
+    python_controller_name = controller.__class__.__name__
+    return snake_case(python_controller_name.replace("Controller", ""))
 
 
 def resolve_endpoint_method_type(method: typing.Callable) -> 'RequestTypes':
@@ -342,7 +409,7 @@ def resolve_uri(method: typing.Callable,
                 method_type: 'RequestTypes') -> str:
     # TODO: тут тоже нужно пошаманить
     is_detailed = resolve_endpoint_detailed(method=method, method_type=method_type)
-    section_name = resolve_controller_name(controller.__class__.__name__)
+    section_name = resolve_controller_name(controller)
     operation_name = method.__name__
     uri = f"{section_name}"
     uri = f"{uri}/{operation_name}" if method_type is RequestTypes.UNDEFINED else uri
@@ -654,8 +721,7 @@ class ArchtoolsOpenApiGenerator:
         # генерация
         controllers = get_api_controllers(self.injector)        
         for controller in controllers:
-            controller_name = type(controller).__name__
-            new_controller_name = resolve_controller_name(controller_name)
+            new_controller_name = resolve_controller_name(controller=controller)
             sections_with_methods = {"detailed": [], new_controller_name: []}
             for method_name, method in get_controller_methods(controller).items():
                 operation_id = method_name

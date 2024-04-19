@@ -1,5 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
+from lib import DTOBase
+
 from core import EditableMetadata
 
 
@@ -12,16 +14,16 @@ class UpdatePropertyPayload(EditableMetadata, BaseModel):
     device_id: Optional[int]
 
 
-class UpdatePropertyDTO(BaseModel):
+class UpdatePropertyDTO(DTOBase):
     id: int
     payload: UpdatePropertyPayload
 
 
-class RetrievePropertyDTO(BaseModel):
+class RetrievePropertyDTO(DTOBase):
     id: int
 
 
-class DeletePropertyDTO(BaseModel):
+class DeletePropertyDTO(DTOBase):
     id: int
 
 
@@ -29,7 +31,7 @@ class CreateDeviceDTO(EditableMetadata, BaseModel):
     property_id: int
 
 
-class RetrieveDeviceDTO(BaseModel):
+class RetrieveDeviceDTO(DTOBase):
     id: int
 
 
@@ -37,7 +39,7 @@ class UpdateDevicePayload(EditableMetadata, BaseModel):
     ...
 
 
-class UpdateDeviceDTO(BaseModel):
+class UpdateDeviceDTO(DTOBase):
     id: int
     payload: UpdateDevicePayload
 
@@ -46,7 +48,7 @@ class UpdateManufacturerPayload(BaseModel):
     ...
 
 
-class UpdateManufacturerDTO(BaseModel):
+class UpdateManufacturerDTO(DTOBase):
     id: int
     payload: UpdateManufacturerPayload
 
@@ -55,7 +57,7 @@ class UpdateDeviceTypePayload(BaseModel):
     ...
 
 
-class UpdateDeviceTypeDTO(BaseModel):
+class UpdateDeviceTypeDTO(DTOBase):
     id: int
     payload: UpdateDeviceTypePayload
 
@@ -64,85 +66,85 @@ class UpdateDeviceModelPayload(BaseModel):
     ...
 
 
-class UpdateDeviceModelDTO(BaseModel):
+class UpdateDeviceModelDTO(DTOBase):
     id: int
     payload: UpdateDeviceModelPayload
 
 
 
-class DeleteDeviceDTO(BaseModel):
+class DeleteDeviceDTO(DTOBase):
     id: int
 
 
 
-class CreateManufacturerDTO(BaseModel):
+class CreateManufacturerDTO(DTOBase):
     ...
 
 
-class RetrieveManufacturerDTO(BaseModel):
+class RetrieveManufacturerDTO(DTOBase):
     ...
 
 
-class DeleteManufacturerDTO(BaseModel):
+class DeleteManufacturerDTO(DTOBase):
     ...
 
 
-class CreateDeviceTypeDTO(BaseModel):
+class CreateDeviceTypeDTO(DTOBase):
     ...
 
 
-class RetrieveDeviceTypeDTO(BaseModel):
+class RetrieveDeviceTypeDTO(DTOBase):
     id: int
 
 
-class DeleteDeviceTypeDTO(BaseModel):
+class DeleteDeviceTypeDTO(DTOBase):
     id: int
 
 
-class CreateDeviceModelDTO(BaseModel):
+class CreateDeviceModelDTO(DTOBase):
     ...
 
 
-class RetrieveDeviceModelDTO(BaseModel):
+class RetrieveDeviceModelDTO(DTOBase):
     id: int
 
 
-class DeleteDeviceModelDTO(BaseModel):
+class DeleteDeviceModelDTO(DTOBase):
     id: int
 
 
-class CreateManufacturerDTO(BaseModel):
+class CreateManufacturerDTO(DTOBase):
     ...
 
 
-class RetrieveManufacturerDTO(BaseModel):
+class RetrieveManufacturerDTO(DTOBase):
     id: int
 
 
-class DeleteManufacturerDTO(BaseModel):
+class DeleteManufacturerDTO(DTOBase):
     id: int
 
 
-class CreateDeviceTypeDTO(BaseModel):
+class CreateDeviceTypeDTO(DTOBase):
     ...
 
 
-class RetrieveDeviceTypeDTO(BaseModel):
+class RetrieveDeviceTypeDTO(DTOBase):
     id: int
 
 
-class DeleteDeviceTypeDTO(BaseModel):
+class DeleteDeviceTypeDTO(DTOBase):
     id: int
 
 
-class CreateDeviceModelDTO(BaseModel):
+class CreateDeviceModelDTO(DTOBase):
     ...
 
 
-class RetrieveDeviceModelDTO(BaseModel):
+class RetrieveDeviceModelDTO(DTOBase):
     id: int
 
 
-class DeleteDeviceModelDTO(BaseModel):
+class DeleteDeviceModelDTO(DTOBase):
     id: int
 

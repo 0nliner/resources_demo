@@ -1,37 +1,40 @@
-from typing import Optional
-from pydantic import BaseModel
+from typing import Optional, Union, TypeVar
+from pydantic import BaseModel, ConfigDict
+from lib import DTOBase
+
+from lib import Blank, DTOField, DTOBase
 
 
-class CreateInnerUserDTO(BaseModel):
+class CreateInnerUserDTO(DTOBase):
     id: int
 
 
-class RetrieveInnerUserDTO(BaseModel):
-    id: Optional[int] = None
-    role_id: Optional[int] = None
-    role: Optional[str] = None
+class RetrieveInnerUserDTO(DTOBase):
+    id: DTOField[int] = Blank
+    role_id: DTOField[int] = Blank
+    role: DTOField[str] = Blank
 
 
-class UpdateInnerUserDTO(BaseModel):
+class UpdateInnerUserDTO(DTOBase):
     ...
 
 
-class DeleteInnerUserDTO(BaseModel):
+class DeleteInnerUserDTO(DTOBase):
     ...
 
 
 # SSO
-class CreateSSOUserDTO(BaseModel):
+class CreateSSOUserDTO(DTOBase):
     username: str
     password: str
 
 
 # services and controllers dtos
-class CreateUserDTO(BaseModel):
+class CreateUserDTO(DTOBase):
     sso_data: CreateSSOUserDTO    
     # TODO: other fields
 
 
-class GetUserDTO(BaseModel):
+class GetUserDTO(DTOBase):
     id: Optional[int]
     username: Optional[str]

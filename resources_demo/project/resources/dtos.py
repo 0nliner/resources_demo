@@ -3,49 +3,51 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 from core import CallerDTO, ReportFormats
 
+from lib import DTOBase
 
-class CreateNodeDTO(BaseModel):
+
+class CreateNodeDTO(DTOBase):
     parent_id: Optional[int] = Field(default_factory=None)
 
 
-class DeleteNodeDTO(BaseModel):
+class DeleteNodeDTO(DTOBase):
     id: Optional[int] = Field(default_factory=None)
 
 
-class UpdateNodeDTO(BaseModel):
+class UpdateNodeDTO(DTOBase):
     ...
 
-class RetrieveNodeDTO(BaseModel):
+class RetrieveNodeDTO(DTOBase):
     id: int
 
 
 # множества
-class CreateNodesDTO(BaseModel):
+class CreateNodesDTO(DTOBase):
     example_name: str
     another_example: Optional[int]
 
 
-class DeleteNodesDTO(BaseModel):
+class DeleteNodesDTO(DTOBase):
     ...
 
 
-class UpdateNodesDTO(BaseModel):
+class UpdateNodesDTO(DTOBase):
     ...
 
 
-class ListNodesDTO(BaseModel):
+class ListNodesDTO(DTOBase):
     caller: CallerDTO
 
 
-class UploadImageDTO(BaseModel):
+class UploadImageDTO(DTOBase):
     ...
 
 
-class CreateBidDTO(BaseModel):
+class CreateBidDTO(DTOBase):
     ...
 
 
-class BidDTO(BaseModel):
+class BidDTO(DTOBase):
     id: int
     subject_id: str
     status_id: str
@@ -60,7 +62,7 @@ class BidDTO(BaseModel):
     created_at: datetime.datetime
 
 
-class CreateReportDTO(BaseModel):
+class CreateReportDTO(DTOBase):
     format_type: ReportFormats
     # дата объектов, участвующих в формировании за временной период
     period_start: Optional[datetime.datetime]

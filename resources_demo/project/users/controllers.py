@@ -16,6 +16,7 @@ class UserController(UsersControllerABC,
                          UpdateInnerUserDTO,
                          DeleteInnerUserDTO]):
 
+
     sso_repo: SSORepoABC
     default_service: UserServiceABC
 

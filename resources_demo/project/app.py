@@ -93,7 +93,7 @@ def policies_authorization(injector: DependecyInjector):
             controller = method.__class__
             is_accesible = await access_service.is_accesible(action=method, caller=caller)
             if is_accesible:
-                result = await method(caller=caller, data=data)
+                result = await method(data=data)
                 return result
             else:
                 # возвращаем permission error

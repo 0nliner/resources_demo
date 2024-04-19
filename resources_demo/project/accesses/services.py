@@ -7,9 +7,10 @@ from core import CallerDTO
 from users.interfaces import UserServiceABC
 from users.dtos import RetrieveInnerUserDTO
 
-from .interfaces import AccessServiceABC
+from .interfaces import AccessServiceABC, PolicyRepoABC
+from .datamappers import PolicyDM
 from .dtos import AccessContext
-from lib.interfaces import get_dto_and_dm
+from lib.interfaces import get_dto_and_dm, resolve_controller_name
 
 
 POLICES = []
@@ -17,6 +18,7 @@ POLICES = []
 
 class AccessService(AccessServiceABC):
     user_service: UserServiceABC
+    policy_repo: PolicyRepoABC
 
     async def is_accesible(self,
                            caller: CallerDTO,
@@ -27,6 +29,7 @@ class AccessService(AccessServiceABC):
         dto, datamapper = get_dto_and_dm(action)
 
         controller: ABCController = None
+        # обработка для дженериков
         if hasattr(action, "__self__"):
             controller = type(action.__self__)
         else:
@@ -36,14 +39,17 @@ class AccessService(AccessServiceABC):
         # self.get_roles_for_dto()
         context = AccessContext(caller=caller, dto=dto)
         # TODO: нужно получить инфу о политиках на контроллер, затем их проитерировать
-        for policy in POLICES:
-            poliсy_decision = await self.is_policy_allows(policy=policy, context=context)
-            if not poliсy_decision:
+        controller_polices = await self.policy_repo.get_polices_by_controller_name(
+            controller_name=resolve_controller_name(controller))
+
+        for policy in controller_polices:
+            policy_decision = await self.is_policy_allows(policy=policy, context=context)
+            if not policy_decision:
                 return False
         return True
 
     async def is_policy_allows(self,
-                               policy,
+                               policy: PolicyDM,
                                context: AccessContext) -> bool:
         for condition in policy.conditions:
             if not condition(context):
@@ -55,6 +61,9 @@ class AccessService(AccessServiceABC):
         скорее всего будет ходить в бэк, в котором описаны роли под дто,
         хотя сам механизм ролей является неполным механизмом авторизации
         """
+        ...
+
+    async def get_controller_polices(self):
         ...
 
     # -----------------------------------------------------------------------------------------

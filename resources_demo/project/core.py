@@ -1,7 +1,8 @@
 from typing import Optional
+import typing
 from sqlalchemy import ARRAY, String
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from users.datamappers import SSOUserDM
 from enum import auto, Enum
 

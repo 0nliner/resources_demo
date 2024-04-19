@@ -2,13 +2,14 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from uuid import UUID
 
+from lib import DTOBase
 
-# class CreateServiceCategoryDTO(BaseModel):
+# class CreateServiceCategoryDTO(DTOBase):
 #     id
 #     title
 
 
-class CreateServiceDTO(BaseModel):
+class CreateServiceDTO(DTOBase):
     title: str
     short_description: str
     long_description: str
@@ -28,7 +29,7 @@ class CreateServiceDTO(BaseModel):
     # realty_object_types: list[UUID]
     
 
-class RetieveServiceDTO(BaseModel):
+class RetieveServiceDTO(DTOBase):
     id: int
 
 
@@ -43,23 +44,23 @@ class UpdateServicePayload(BaseModel):
     image_thumbnail_url: Optional[str]
 
 
-class UpdateServiceDTO(BaseModel):
+class UpdateServiceDTO(DTOBase):
     id: int
     payload: UpdateServicePayload
 
 
-class DeleteServiceDTO(BaseModel):
+class DeleteServiceDTO(DTOBase):
     id: int
 
 
 #  категории
-class CreateServiceCategoryDTO(BaseModel):
+class CreateServiceCategoryDTO(DTOBase):
     title: str
     is_active: Optional[bool]
     icon_tag: Optional[str]
 
 
-class RetrieveServiceCategoryDTO(BaseModel):
+class RetrieveServiceCategoryDTO(DTOBase):
     id: int
 
 
@@ -69,10 +70,10 @@ class UpdateServiceCategoryPayload(BaseModel):
     icon_tag: Optional[str]
 
 
-class UpdateServiceCategoryDTO(BaseModel):
+class UpdateServiceCategoryDTO(DTOBase):
     id: int
     payload: UpdateServiceCategoryPayload
 
 
-class DeleteServiceCategoryDTO(BaseModel):
+class DeleteServiceCategoryDTO(DTOBase):
     id: int

@@ -1,9 +1,13 @@
 from abc import abstractmethod
 import typing
 
-from archtool.layers.default_layer_interfaces import ABCService, ABCController
+from sqlalchemy.ext.asyncio import AsyncSession
+from archtool.layers.default_layer_interfaces import ABCService, ABCController, ABCRepo
+from pydantic import TypeAdapter
 
-from .dtos import AccessContext
+from .datamappers import *
+from .dtos import *
+from lib.interfaces import RepoMixinsABC
 from core import CallerDTO
 
 
@@ -53,4 +57,20 @@ class AccessServiceABC(ABCService):
 
     @abstractmethod
     async def during_business_hours(self, context: AccessContext) -> bool:
+        ...
+
+
+class PolicyRepoABC(ABCRepo,
+                    RepoMixinsABC[
+                        PolicyDM,
+                        CreatePolicyDTO,
+                        RetrievePolicyDTO,
+                        UpdatePolicyDTO,
+                        DeletePolicyDTO]):
+    
+    @abstractmethod
+    async def get_polices_by_controller_name(self,
+                                             controller_name: str,
+                                             session: Optional[AsyncSession] = None
+                                             ) -> list[PolicyDM]:
         ...

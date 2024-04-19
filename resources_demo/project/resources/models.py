@@ -1,9 +1,12 @@
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String, case
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from core import Base, ImagesLinks, DefautMetadata, DocumentsLinks
+
+if TYPE_CHECKING:
+    from devices.models import Property
 
 
 class Node(ImagesLinks, DefautMetadata, DocumentsLinks):
@@ -14,7 +17,8 @@ class Node(ImagesLinks, DefautMetadata, DocumentsLinks):
     parent: Mapped['Node'] = relationship("Node", back_populates="children", remote_side=[id])
     children: Mapped[Optional[list['Node']]] = relationship('Node', back_populates="parent")
     type: Mapped[str] = mapped_column(String(50))
-    # properties: Mapped[list['Property']] = relationship(back_populates="node")
+    properties: Mapped[list['Property']] = relationship('Property', back_populates="node")
+
     __mapper_args__ = {
         'polymorphic_identity': 'nodes',
         'polymorphic_on': case(

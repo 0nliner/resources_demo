@@ -69,15 +69,3 @@ class DeviceRepo(DeviceRepoABC,
     model = Device
     session_maker: sessionmaker
     
-
-
-class PropertyRepo(PropertyRepoABC,
-                      RepoMixins[PropertyDM,
-                                    CreatePropertyDTO,
-                                    RetrievePropertyDTO,
-                                    UpdatePropertyDTO,
-                                    DeletePropertyDTO]):
-
-    model = Property
-    session_maker: sessionmaker
-    
