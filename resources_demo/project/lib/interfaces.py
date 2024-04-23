@@ -7,7 +7,7 @@ from multimethod import multimethod
 from sqlalchemy import select, update, delete, BinaryExpression, Selectable
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, validator
 from archtool.layers.default_layer_interfaces import ABCController
 from archtool.dependecy_injector import DependecyInjector
 
@@ -17,8 +17,8 @@ from pydantic import TypeAdapter
 
 TT = typing.TypeVar("TT", bound=BaseModel)
 CT = typing.TypeVar("CT", bound=BaseModel)
-RT = typing.TypeVar("RT", bound=BaseModel)
-UT = typing.TypeVar("UT", bound=BaseModel)
+RT = typing.TypeVar("RT", bound="BaseSelection")
+UT = typing.TypeVar("UT", bound=('FilterDTOABC'))
 DT = typing.TypeVar("DT", bound=BaseModel)
 
 DTO_T = typing.Union[CT, RT, UT, DT]
@@ -55,10 +55,14 @@ class Blank(type):
 
 T = typing.TypeVar("T")
 DTOField = typing.Union[typing.Optional[T], Blank]
-
+OneOrMultuple = typing.Union[T, list[T]]
 
 class DTOBase(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    @property
+    def not_blank(self):
+        return {key: value for key, value in vars(self).items() if value is not Blank}
 
 class DMBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -71,21 +75,104 @@ class PaginationInfo(BaseModel):
     page_start: int = 0
 
 
-class FilterDTOABC(ABC):
-    # filter_by_conditions = 
-    # paginagion_info: PaginationInfo
+class BaseSelection(DTOBase):
+    def __init__(self, **data):
+        prepared_data = {}
+        for key, value in data.items():
+            splitted = key.split("__")
+            name = splitted[0]
+            if name not in prepared_data:
+                prepared_data.update({name: []})
+            field_expressions = prepared_data[name]
+            new_expr = Expression(raw_expression=key, value=value)
+            field_expressions.append(new_expr)
+        super().__init__(**prepared_data)
+
+
+
+class FilterDTOABC:
+    payload: DTOBase
+    selection: DTOBase
+
+
+from enum import Enum
+
+
+class NoSuchOperation(Exception):
     ...
 
 
-def build_where_expr(data: FilterDTOABC, selectable: Selectable) -> typing.Optional[BinaryExpression]:
-    # пока простой пример
-    expression: typing.Optional[BinaryExpression] = None
-    for key, val in vars(data).items():
-        if val is Blank:
-            continue
-        attr = getattr(selectable, key)
-        expression = expression and (attr == val) if expression else (attr == val)
+class OperationTypes(Enum):
+    gt = "__gt__"
+    gte = "__gte__"
+    lte = "__lte__"
+    lt = "__lt__"
+    eq = "__eq__"
+    included = "in_"
+
+def orm_all(expressions) -> BinaryExpression:
+    expressions = list(expressions)
+    final_expression = expressions.pop(0)
+    while True:
+        try:
+            expr = expressions.pop(0)
+            final_expression = final_expression & expr
+        except IndexError:
+            break
+    return final_expression
+
+
+
+def build_where_expr(selection: DTOBase,
+                     selectable: DeclarativeBase) -> typing.Optional[BinaryExpression]:
+    orm_expressions = []
+    for expression, value in selection.not_blank.items():
+        if isinstance(value, Expression):
+            orm_expr = sql_from_expr(expr=value, selectable=selectable)
+            orm_expressions.append(orm_expr)
+        elif isinstance(value, list) and len(value) and isinstance(value[0], Expression):
+            for expr in value:
+                orm_expr = sql_from_expr(expr=expr, selectable=selectable)
+                orm_expressions.append(orm_expr)
+    return orm_all(orm_expressions)
+
+
+def parse_query_string(string: str) -> tuple[str, OperationTypes]:
+    # TODO: подрефачить
+    if "__" not in string:
+        name, expression = (string, "__eq__")
+    else:
+        name, expression = string.split("__")
+        expression = f"__{expression}__" if expression != OperationTypes.included.value else "in_"
+
+    expr_type = [el for el in OperationTypes if el.value == expression][0] 
+    return name, expr_type    
+
+
+def sql_from_expr(expr: 'Expression',
+                  selectable: DeclarativeBase) -> BinaryExpression:
+    readonly_column = getattr(selectable, expr.field_name)
+    expression = getattr(readonly_column, expr.expression_type.value)(expr.value)
     return expression
+
+
+ExprT = typing.TypeVar("ExprT")
+
+
+class Expression(typing.Generic[ExprT], DTOBase):
+    expression_type: OperationTypes
+    field_name: str
+    value: ExprT
+
+    def __init__(self, raw_expression: str, value: ExprT):
+        field_name, expression_type = parse_query_string(raw_expression)
+        value = value
+        super().__init__(expression_type=expression_type,
+                         value=value,
+                         field_name=field_name)
+
+
+Expressions = DTOField[OneOrMultuple[Expression[T]]]
 
 
 class RepoMixinsABC(ABC, typing.Generic[TT, CT, RT, UT, DT]):
@@ -101,11 +188,11 @@ class RepoMixinsABC(ABC, typing.Generic[TT, CT, RT, UT, DT]):
         ...
 
     @abstractmethod
-    async def update(self, data: UT, session: typing.Optional[AsyncSession] = None) -> TT:
+    async def update(self, data: UT, session: typing.Optional[AsyncSession] = None) -> OneOrMultuple[TT]:
         ...
 
     @abstractmethod
-    async def delete(self, data: DT, session: typing.Optional[AsyncSession] = None) -> None:
+    async def delete(self, data: DT, session: typing.Optional[AsyncSession] = None, commit: bool = False) -> int:
         ...
 
     @abstractmethod
@@ -166,7 +253,7 @@ class RepoMixins(RepoMixinsABC[TT, CT, RT, UT, DT]):
             return self.default_dm.model_validate(new_object)
 
     async def retrieve(self, data: RT, session: typing.Optional[AsyncSession] = None) -> TT:
-        where_expression = build_where_expr(data, self.model)
+        where_expression = build_where_expr(selection=data, selectable=self.model)
         query = select(self.model).where(where_expression).limit(1)
         async with self.get_or_create_session(session) as session:
             conn = await session.execute(query)
@@ -176,25 +263,42 @@ class RepoMixins(RepoMixinsABC[TT, CT, RT, UT, DT]):
                 return self.default_dm.model_validate(result)
             else:
                 raise NotExist()
-            
 
-    async def update(self, data: UT, session: typing.Optional[AsyncSession] = None) -> TT:
-        orm_expression: BinaryExpression = build_where_expr(data)
-        values = {}
+    async def update(self, data: UT, session: typing.Optional[AsyncSession] = None) -> OneOrMultuple[TT]:
+        orm_expression: BinaryExpression = build_where_expr(selection=data.selection,
+                                                            selectable=self.model)
+        values = data.payload.not_blank
         query = update(self.model)\
                 .where(orm_expression)\
                 .values(**values)\
                 .returning(self.model)
         async with self.get_or_create_session(session) as session:
-            records = await session.execute(query)
-            session.add_all(records)
-            return records
+            cursor = await session.execute(query)
+            records = cursor.mappings().all()
+            records = [list(e.values())[0] for e in records]
+            result = self.serialize(records)
+            return result
 
-    async def delete(self, data: DT, session: typing.Optional[AsyncSession] = None) -> DT:
-        where_expr = build_where_expr(data)
+    def serialize(self, records) -> TT:
+        records_quantity = len(records)
+        if records_quantity == 1:
+            serialized_result = self.default_dm.model_validate(records[1])
+        elif records_quantity > 1:
+            t = TypeAdapter(list[self.default_dm])
+            serialized_result = t.validate_python(records)
+        else:
+            serialized_result = []
+        return serialized_result
+
+    async def delete(self, data: DT, session: typing.Optional[AsyncSession] = None, commit: bool = False) -> int:
+        where_expr = build_where_expr(selection=data, selectable=self.model)
         query = delete(self.model).where(where_expr)
         async with self.get_or_create_session(session) as session:
-            await session.execute(query)
+            cursor = await session.execute(query)
+            if commit:
+                await session.commit()
+            return cursor.rowcount
+
 
     @asynccontextmanager
     async def filter(self,

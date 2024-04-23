@@ -55,6 +55,7 @@ async def clean_test_session(injector: DependecyInjector):
     async with session_maker() as session:
         yield session
         await session.rollback()
+        # await session.rollback()
 
 # @pytest.fixture(scope="function")
 # async def clean_test_session(injector: DependecyInjector):

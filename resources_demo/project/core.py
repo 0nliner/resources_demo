@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict
 from users.datamappers import SSOUserDM
 from enum import auto, Enum
 
+from lib import Blank, DTOField, DTOBase
 
 
 Base = declarative_base()
@@ -27,22 +28,36 @@ class ReportBy(Enum):
 class BidSubjects(Enum):
     test_subjects = auto()
 
+# 
+class EditableMetadata(DTOBase):
+    name: DTOField[str] = Blank
+    description: DTOField[str] = Blank
+    extra: DTOField[str] = Blank
+    comments: DTOField[str] = Blank
 
-class EditableMetadata(BaseModel):
-    name: Optional[str]
-    description: Optional[str]
-    extra: Optional[str]
-    comments: Optional[str]
+
+class EditableMetadataDM(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    extra: Optional[str] = None
+    comments: Optional[str] = None
 
 
+class ActionOnEditableMetadataMixin(DTOBase):
+    name: DTOField[str] = Blank
+    description: DTOField[str] = Blank
+    extra: DTOField[str] = Blank
+    comments: DTOField[str] = Blank
+
+# 
 class ImagesLinks(Base):
     __abstract__ = True
-    images: Mapped[list[str]] = mapped_column(ARRAY(String(100)))
+    images: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String(100)), nullable=True)
 
 
 class DocumentsLinks(Base):
     __abstract__ = True
-    docs: Mapped[list[str]] = mapped_column(ARRAY(String(100)))
+    docs: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String(100)), nullable=True)
 
 
 from sqlalchemy import DateTime
@@ -57,7 +72,7 @@ class Dates(Base):
 # Base, 
 class DefautMetadata(Dates):
     __abstract__ = True
-    name: Mapped[Optional[str]] = mapped_column(String(128), nullable=False)
+    name: Mapped[Optional[str]] = mapped_column(String(128))
     description: Mapped[Optional[str]] = mapped_column(String(1024))
     # extra: Mapped[JSONB] = mapped_column(nullable=True)
     comments: Mapped[Optional[str]] = mapped_column(nullable=True)

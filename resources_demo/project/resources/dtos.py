@@ -1,24 +1,100 @@
+from enum import Enum, auto
 import datetime
-from typing import Optional
-from pydantic import BaseModel, ConfigDict, Field
-from core import CallerDTO, ReportFormats
+from typing import Optional, TypeVar, Generic, Union
+from pydantic import BaseModel, ConfigDict, Field, validator
+from core import ActionOnEditableMetadataMixin, CallerDTO, ReportFormats
 
-from lib import DTOBase
+from lib import DTOBase, Blank, DTOField
 
+
+SelectionT = TypeVar("SelectionT")
+SubDTO_T = TypeVar("SubDTO_T")
+
+
+# class BaseDTORelationAction(Generic[SelectionT], DTOBase):
+    # selection: SelectionT
+
+# class CreateSubs(Generic[SelectionT, SubDTO_T], DTOBase):
+    # selection: SelectionT
+    # sub_data: SubDTO_T
+
+
+# class LinkExistingObjects(BaseDTORelationAction[SelectionT], DTOBase):
+    # ...
+
+
+# class UnlinkSubs(BaseDTORelationAction[SelectionT], DTOBase):
+    # delete: bool = False
+
+
+# class AddListElements:
+#     ...
+
+# class RemoveListElements:
+#     ...
+
+
+# DefaultDTORelationActions = Union[CreateSubs, LinkExistingObjects, UnlinkSubs]
+"""
+{
+    "selection": {
+        "title__ilike": "Hello",
+        "id__in": [1, 4, 6],
+        "created_at__gt": 15.06.2007,
+        "created_at__lt": 15.06.2010
+    },
+    "payload": {}
+}
+"""
+from pydantic import validator
+from lib.interfaces import Expression, OneOrMultuple, BaseSelection, Expressions
+T = TypeVar("T")
+
+
+# TODO: перенести в core
+class IdSelection(BaseSelection):
+    id: Expressions[int] = Blank
+
+class DateSelection(BaseSelection):
+    created_at: Expressions[datetime.datetime] = Blank
+    updated_at: Expressions[datetime.datetime] = Blank
+
+
+# TODO: сделать проверку на то, что хотя бы одно поле заполнено в конечном селекшене
+
+
+class DefaultMetadataSelection(BaseSelection):
+    name: Expressions[str] = Blank
+    description: Expressions[str] = Blank
+    comments: Expressions[str] = Blank
+
+
+
+class ImagesLinks:
+    ...
+
+
+class DocumentsLinks:
+    ...
+
+
+# ______________________________________________________________________________________
+from .models import Node
 
 class CreateNodeDTO(DTOBase):
-    parent_id: Optional[int] = Field(default_factory=None)
-
+    parent_id: Optional[int] = None
 
 class DeleteNodeDTO(DTOBase):
     id: Optional[int] = Field(default_factory=None)
 
 
 class UpdateNodeDTO(DTOBase):
-    ...
+    parent_id: DTOField[int] = Blank
+    # children: DTOField[list[UnlinkSubs]] = Blank
 
-class RetrieveNodeDTO(DTOBase):
-    id: int
+
+class RetrieveNodeDTO(IdSelection):
+    ...
 
 
 # множества
@@ -31,8 +107,25 @@ class DeleteNodesDTO(DTOBase):
     ...
 
 
-class UpdateNodesDTO(DTOBase):
+class NodesSelection(IdSelection, DateSelection, DefaultMetadataSelection):
     ...
+
+
+class UpdateNodesPayload(ActionOnEditableMetadataMixin):
+    parent_id: DTOField[int] = Blank
+    # children: DTOField[list[Union[
+    #     CreateSubs[NodesSelection, CreateNodeDTO],
+    #     UnlinkSubs[NodesSelection],
+    #     LinkExistingObjects[NodesSelection]
+    #     ]]] = Blank
+    # docs: DTOField[Union[]]
+    # images: TODO
+
+
+
+class UpdateNodesDTO(DTOBase):
+    selection: NodesSelection
+    payload: UpdateNodesPayload
 
 
 class ListNodesDTO(DTOBase):

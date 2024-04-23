@@ -1,16 +1,17 @@
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 
+from core import EditableMetadataDM
+from lib.interfaces import DMBase
+
 
 class NodesDM(BaseModel):
     ...
 
 
-class NodeDM(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
+class NodeDM(EditableMetadataDM, DMBase):
     id: int
-    parent_id: Optional[int]
+    parent_id: Optional[int] = None
 
 
 class ImageDM(BaseModel):

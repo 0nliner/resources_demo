@@ -4,9 +4,9 @@ from archtool.layers.default_layer_interfaces import (
     ABCService,
     ABCRepo)
 
-from lib.interfaces import RepoMixinsABC
+from lib.interfaces import RepoMixinsABC, OneOrMultuple
 from core import CallerDTO, ReportFormats
-from .dtos import (CreateNodesDTO,
+from .dtos import (CreateNodesDTO, NodesSelection,
                    UpdateNodesDTO,
                    DeleteNodesDTO,
                    ListNodesDTO,
@@ -41,9 +41,9 @@ class NodesControllerABC(ABCController):
 class NodesRepoABC(ABCRepo,
                    RepoMixinsABC[NodeDM,
                                  CreateNodeDTO,
-                                 RetrieveNodeDTO,
-                                 UpdateNodeDTO,
-                                 DeleteNodeDTO]):
+                                 NodesSelection,
+                                 UpdateNodesDTO,
+                                 NodesSelection]):
     @abstractmethod
     async def list(self, data: ListNodesDTO) -> NodesDM:
         ...

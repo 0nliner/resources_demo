@@ -2,23 +2,22 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .dtos import (ListNodesDTO,
+                   UpdateNodesDTO,
                    CreateNodeDTO,
-                   RetrieveNodeDTO,
-                   UpdateNodeDTO,
-                   DeleteNodeDTO,
+                   NodesSelection,
                    UploadImageDTO)
 from .models import Node
 from .datamappers import NodesDM, NodeDM, ImageDM
 from .interfaces import NodesRepoABC
-from lib.interfaces import RepoMixins
+from lib.interfaces import RepoMixins, OneOrMultuple
 
 
 class NodesRepo(NodesRepoABC,
                 RepoMixins[NodeDM,
                            CreateNodeDTO,
-                           RetrieveNodeDTO,
-                           UpdateNodeDTO,
-                           DeleteNodeDTO]):
+                           NodesSelection,
+                           UpdateNodesDTO,
+                           NodesSelection]):
     model = Node
     session_maker: sessionmaker
     
