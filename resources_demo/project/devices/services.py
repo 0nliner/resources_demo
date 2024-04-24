@@ -11,15 +11,15 @@ class PropertyService(PropertyServiceABC,
                       ServiceMixins[
                           PropertyDM,
                           CreatePropertyDTO,
-                          RetrievePropertyDTO,
-                          UpdatePropertyDTO,
-                          DeletePropertyDTO]):
+                          PropertySelection,
+                          UpdatePropertiesDTO,
+                          PropertySelection]):
 
     default_repo: PropertyRepoABC
     property_repo: PropertyRepoABC
     device_repo: DeviceRepoABC
 
-    async def update(self, data: UpdatePropertyDTO) -> PropertyDM:
+    async def update(self, data: UpdatePropertiesDTO) -> PropertyDM:
         # проверяем существует ли устройство, которое хотим подвязать к объекту,
         # если объект не существует - райзим ошибку
         await self.property_repo.get(data.id, raise_on_none=True)
@@ -36,9 +36,9 @@ class DeviceService(DeviceServiceABC,
                     ServiceMixins[
                           DeviceDM,
                           CreateDeviceDTO,
-                          RetrieveDeviceDTO,
+                          DeviceSelection,
                           UpdateDeviceDTO,
-                          DeleteDeviceDTO]):
+                          DeviceSelection]):
 
     default_repo: DeviceRepoABC
 
@@ -47,9 +47,9 @@ class ManufacturerService(ManufacturerServiceABC,
                           ServiceMixins[
                             ManufacturerDM,
                             CreateManufacturerDTO,
-                            RetrieveManufacturerDTO,
+                            ManufacturerSelection,
                             UpdateManufacturerDTO,
-                            DeleteManufacturerDTO]):
+                            ManufacturerSelection]):
 
     default_repo: ManufacturerRepoABC
 
@@ -58,9 +58,9 @@ class DeviceTypeService(DeviceTypeServiceABC,
                           ServiceMixins[
                             DeviceTypeDM,
                             CreateDeviceTypeDTO,
-                            RetrieveDeviceTypeDTO,
+                            DeviceSelection,
                             UpdateDeviceTypeDTO,
-                            DeleteDeviceTypeDTO]):
+                            DeviceSelection]):
 
     default_repo: DeviceTypeRepoABC
 
@@ -69,9 +69,9 @@ class DeviceModelService(DeviceModelServiceABC,
                           ServiceMixins[
                             DeviceModelDM,
                             CreateDeviceModelDTO,
-                            RetrieveDeviceModelDTO,
+                            DeviceModelSelection,
                             UpdateDeviceModelDTO,
-                            DeleteDeviceModelDTO]):
+                            DeviceModelSelection]):
 
     default_repo: DeviceModelRepoABC
 
@@ -80,9 +80,9 @@ class DeviceService(DeviceServiceABC,
                           ServiceMixins[
                             DeviceDM,
                             CreateDeviceDTO,
-                            RetrieveDeviceDTO,
+                            DeviceSelection,
                             UpdateDeviceDTO,
-                            DeleteDeviceDTO]):
+                            DeviceSelection]):
 
     default_repo: DeviceRepoABC
 

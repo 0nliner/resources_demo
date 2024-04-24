@@ -10,21 +10,21 @@ from accesses.dtos import CreatePolicyDTO
 """
 
 
-async def test_policy_middleware(injector, api_client, clean_test_session):
-    # TODO: создать тестовые политики, проверить что правильно отрабатывают
-    # TODO: проконтролировать что для запроса пользователя правильно создаётся AccessContext (там не хватает логики)
-    access_service = 
-    all_checks = ...
-    checks
+# async def test_policy_middleware(injector, api_client, clean_test_session):
+#     # TODO: создать тестовые политики, проверить что правильно отрабатывают
+#     # TODO: проконтролировать что для запроса пользователя правильно создаётся AccessContext (там не хватает логики)
+#     access_service = 
+#     all_checks = ...
+#     checks
 
-    polices = [
-        dict(policy_on=UsersControllerABC.create, policy_data=dict(role_id=1), conditions=checks)
-    ]
+#     polices = [
+#         dict(policy_on=UsersControllerABC.create, policy_data=dict(role_id=1), conditions=checks)
+#     ]
 
-    policy_repo: PolicyRepoABC = injector.get_dependency(PolicyRepoABC)
-    for policy in polices:
-        new_policy = await policy_repo.create(data=CreatePolicyDTO(**policy),
-                                              session=clean_test_session)
+#     policy_repo: PolicyRepoABC = injector.get_dependency(PolicyRepoABC)
+#     for policy in polices:
+#         new_policy = await policy_repo.create(data=CreatePolicyDTO(**policy),
+#                                               session=clean_test_session)
     # тут запрос
     # тут проверка
 

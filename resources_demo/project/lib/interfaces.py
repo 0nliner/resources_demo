@@ -761,6 +761,9 @@ def get_dto_and_dm(method: typing.Callable) -> tuple[BaseModel, BaseModel]:
         return method_dto, method_dm
 
 
+from jinja2 import Environment, PackageLoader, select_autoescape
+
+
 class ArchtoolsOpenApiGenerator:
     DTO_BASE = BaseModel
     TYPES_MAPPING = {
@@ -777,6 +780,12 @@ class ArchtoolsOpenApiGenerator:
         self.dms = {}
         self.uri_prefix = uri_prefix
         self._process_after = {}
+
+        self.env = Environment(
+            loader=PackageLoader(".autodocs"),
+            autoescape=select_autoescape()
+        )
+
 
     def generate_openapi_model(self, model: BaseModel) -> str:
         fields = model.model_fields
@@ -809,24 +818,23 @@ class ArchtoolsOpenApiGenerator:
     def get_ref_on_model(self, model: BaseModel):
         ...
 
-    def generate_openapi(self, dest_folder: pathlib.Path):
+    def generate_openapi(self, dest_file: pathlib.Path):
         # инициализация базовых папок
-        while True:
-            if not dest_folder.exists():
-                dest_folder.mkdir()
-                paths_folder = dest_folder / "paths"
-                schemas_folder = dest_folder / "schemas"
-                for folder in [paths_folder, schemas_folder]:
-                    folder.mkdir()
-                break
-            else:
-                dest_folder.rmdir()
+        # while True:
+        #     if not dest_file.exists():
+        #         dest_folder.mkdir()
+        #         paths_folder = dest_folder / "paths"
+        #         schemas_folder = dest_folder / "schemas"
+        #         for folder in [paths_folder, schemas_folder]:
+        #             folder.mkdir()
+        #         break
+        #     else:
+        #         dest_folder.rmdir()
 
         # генерация
         controllers = get_api_controllers(self.injector)        
         for controller in controllers:
             new_controller_name = resolve_controller_name(controller=controller)
-            sections_with_methods = {"detailed": [], new_controller_name: []}
             for method_name, method in get_controller_methods(controller).items():
                 operation_id = method_name
                 method_type = resolve_endpoint_method_type(method=method)
@@ -843,33 +851,10 @@ class ArchtoolsOpenApiGenerator:
                                                    request_type=method_type.value,
                                                    dto=dto,
                                                    dm=dm)
-                case_1 = not uri.endswith(new_controller_name)
-                case_2 = not uri.endswith('{id:\d+}')
-                is_special_name = uri.endswith(new_controller_name) and uri.endswith('{id:\d+}')
-                if is_special_name and not is_method_detailed:
-                    sections_with_methods[new_controller_name].append(openapi_endpoint)
-                elif is_method_detailed and not is_special_name:
-                    sections_with_methods["detailed"].append(openapi_endpoint)
-                else:
-                    sections_with_methods.update({operation_id: openapi_endpoint})
+
                 self.endpoints.append(openapi_endpoint)
-            # создаём папку для контроллера
-            controller_paths_folder = paths_folder / new_controller_name
-            controller_paths_folder.mkdir()
-            # нужно создать файлы под хранение каждого типа метода 
-            # controller_paths_folder / controller_name
 
 
-
-
-        controllers = get_api_controllers(injector=self.injector)
-        for controller in controllers:
-            for method_name, method in get_controller_methods(controller).items():
-                method_type = resolve_endpoint_method_type(method=method)
-                uri = self.uri_prefix + resolve_uri(method=method,
-                                                    controller=controller,
-                                                    method_type=method_type)
-                router_method = getattr(http_app.router, f"add_{method_type.value}")
 
 
 class ArchtoolsGrpcGenerator:

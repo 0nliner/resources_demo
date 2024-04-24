@@ -12,9 +12,9 @@ class PropertyControllerABC(ABCController,
                             ControllerMixinsABC[
                                 PropertyDM,
                                 CreatePropertyDTO,
-                                RetrievePropertyDTO,
-                                UpdatePropertyDTO,
-                                DeletePropertyDTO]):
+                                PropertySelection,
+                                UpdatePropertiesDTO,
+                                PropertySelection]):
     ...
 
 
@@ -22,27 +22,27 @@ class ManufacturerControllerABC(ABCController,
                                 ControllerMixinsABC[
                                     ManufacturerDM,
                                     CreateManufacturerDTO,
-                                    RetrieveManufacturerDTO,
+                                    ManufacturerSelection,
                                     UpdateManufacturerDTO,
-                                    DeleteManufacturerDTO]):
+                                    ManufacturerSelection]):
     ...
 
 class DeviceTypeControllerABC(ABCController,
                               ControllerMixinsABC[
                                 DeviceTypeDM,
                                 CreateDeviceTypeDTO,
-                                RetrieveDeviceTypeDTO,
+                                DeviceSelection,
                                 UpdateDeviceTypeDTO,
-                                DeleteDeviceTypeDTO]):
+                                DeviceSelection]):
     ...
 
 class DeviceModelControllerABC(ABCController,
                                ControllerMixinsABC[
                                 DeviceModelDM,
                                 CreateDeviceModelDTO,
-                                RetrieveDeviceModelDTO,
+                                DeviceModelSelection,
                                 UpdateDeviceModelDTO,
-                                DeleteDeviceModelDTO]):
+                                DeviceModelSelection]):
     ...
 
 
@@ -50,9 +50,9 @@ class DeviceControllerABC(ABCController,
                           ControllerMixinsABC[
                             DeviceDM,
                             CreateDeviceDTO,
-                            RetrieveDeviceDTO,
+                            DeviceSelection,
                             UpdateDeviceDTO,
-                            DeleteDeviceDTO]):
+                            DeviceSelection]):
     ...
 
 
@@ -62,9 +62,9 @@ class PropertyServiceABC(ABCService,
                              ServiceMixinsABC[
                                PropertyDM,
                                CreatePropertyDTO,
-                               RetrievePropertyDTO,
-                               UpdatePropertyDTO,
-                               DeletePropertyDTO
+                               PropertySelection,
+                               UpdatePropertiesDTO,
+                               PropertySelection
                              ]):
     ...
 
@@ -73,9 +73,9 @@ class ManufacturerServiceABC(ABCService,
                              ServiceMixinsABC[
                                ManufacturerDM,
                                CreateManufacturerDTO,
-                               RetrieveManufacturerDTO,
+                               ManufacturerSelection,
                                UpdateManufacturerDTO,
-                               DeleteManufacturerDTO
+                               ManufacturerSelection
                              ]):
     ...
 
@@ -83,9 +83,9 @@ class DeviceTypeServiceABC(ABCService,
                              ServiceMixinsABC[
                                DeviceTypeDM,
                                CreateDeviceTypeDTO,
-                               RetrieveDeviceTypeDTO,
+                               DeviceSelection,
                                UpdateDeviceTypeDTO,
-                               DeleteDeviceTypeDTO
+                               DeviceSelection
                              ]):
     ...
 
@@ -93,9 +93,9 @@ class DeviceModelServiceABC(ABCService,
                              ServiceMixinsABC[
                                DeviceModelDM,
                                CreateDeviceModelDTO,
-                               RetrieveDeviceModelDTO,
+                               DeviceModelSelection,
                                UpdateDeviceModelDTO,
-                               DeleteDeviceModelDTO
+                               DeviceModelSelection
                              ]):
     ...
 
@@ -104,9 +104,9 @@ class DeviceServiceABC(ABCService,
                        ServiceMixinsABC[
                            DeviceDM,
                            CreateDeviceDTO,
-                           RetrieveDeviceDTO,
+                           DeviceSelection,
                            UpdateDeviceDTO,
-                           DeleteDeviceDTO
+                           DeviceSelection
                            ]):
     ...
 
@@ -115,29 +115,31 @@ class ManufacturerRepoABC(ABCRepo,
                           RepoMixinsABC[
                             ManufacturerDM,
                             CreateManufacturerDTO,
-                            RetrieveManufacturerDTO,
+                            ManufacturerSelection,
                             UpdateManufacturerDTO,
-                            DeleteManufacturerDTO
+                            ManufacturerSelection
                           ]):
     ...
+
 
 class DeviceTypeRepoABC(ABCRepo,
                           RepoMixinsABC[
                             DeviceTypeDM,
                             CreateDeviceTypeDTO,
-                            RetrieveDeviceTypeDTO,
+                            DeviceSelection,
                             UpdateDeviceTypeDTO,
-                            DeleteDeviceTypeDTO
+                            DeviceSelection
                           ]):
     ...
+
 
 class DeviceModelRepoABC(ABCRepo,
                           RepoMixinsABC[
                             DeviceModelDM,
                             CreateDeviceModelDTO,
-                            RetrieveDeviceModelDTO,
+                            DeviceModelSelection,
                             UpdateDeviceModelDTO,
-                            DeleteDeviceModelDTO
+                            DeviceModelSelection
                           ]):
     ...
 
@@ -145,16 +147,16 @@ class DeviceModelRepoABC(ABCRepo,
 class DeviceRepoABC(ABCRepo,
                       RepoMixinsABC[DeviceDM,
                                     CreateDeviceDTO,
-                                    RetrieveDeviceDTO,
+                                    DeviceSelection,
                                     UpdateDeviceDTO,
-                                    DeleteDeviceDTO]):
+                                    DeviceSelection]):
     ...
 
 
 class PropertyRepoABC(ABCRepo,
                       RepoMixinsABC[PropertyDM,
                                     CreatePropertyDTO,
-                                    RetrievePropertyDTO,
-                                    UpdatePropertyDTO,
-                                    DeletePropertyDTO]):
+                                    PropertySelection,
+                                    UpdatePropertiesDTO,
+                                    PropertySelection]):
     ...

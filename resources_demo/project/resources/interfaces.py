@@ -4,49 +4,47 @@ from archtool.layers.default_layer_interfaces import (
     ABCService,
     ABCRepo)
 
-from lib.interfaces import RepoMixinsABC, OneOrMultuple
+from lib.interfaces import (
+    RepoMixinsABC,
+    ControllerMixinsABC,
+    ServiceMixinsABC)
+
 from core import CallerDTO, ReportFormats
-from .dtos import (CreateNodesDTO, NodesSelection,
+from .dtos import (NodesSelection,
                    UpdateNodesDTO,
-                   DeleteNodesDTO,
-                   ListNodesDTO,
+                   CreateNodeDTO)
 
-                   CreateNodeDTO,
-                   RetrieveNodeDTO,
-                   UpdateNodeDTO,
-                   DeleteNodeDTO,
-                   CreateReportDTO)
-
-from .datamappers import NodesDM, NodeDM
+from .datamappers import NodeDM
 
 
-class NodesControllerABC(ABCController):
-    @abstractmethod
-    async def create_multiple(self, data: CreateNodesDTO) -> NodesDM:
-        ...
-
-    @abstractmethod
-    async def delete_multiple(self, data: DeleteNodesDTO) -> None:
-        ...
-
-    @abstractmethod
-    async def update_multiple(self, data: UpdateNodesDTO) -> None:
-        ...
-
-    @abstractmethod
-    async def list_nodes(self, data: ListNodesDTO) -> NodesDM:
-        ...
-
-
-class NodesRepoABC(ABCRepo,
-                   RepoMixinsABC[NodeDM,
+class NodesControllerABC(ABCController,
+                         ControllerMixinsABC[
+                                 NodeDM,
                                  CreateNodeDTO,
                                  NodesSelection,
                                  UpdateNodesDTO,
                                  NodesSelection]):
-    @abstractmethod
-    async def list(self, data: ListNodesDTO) -> NodesDM:
-        ...
+    ...
+
+
+class NodesServiceABC(ABCService,
+                      ServiceMixinsABC[
+                                NodeDM,
+                                CreateNodeDTO,
+                                NodesSelection,
+                                UpdateNodesDTO,
+                                NodesSelection]):
+    ...
+
+
+class NodesRepoABC(ABCRepo,
+                   RepoMixinsABC[
+                       NodeDM,
+                       CreateNodeDTO,
+                       NodesSelection,
+                       UpdateNodesDTO,
+                       NodesSelection]):
+    ...
 
 
 # class ReportControllerABC(ABCController):

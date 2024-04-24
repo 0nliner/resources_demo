@@ -79,6 +79,11 @@ async def test_delete_nodes(injector, clean_test_session, test_nodes_structure):
     assert result
 
 
+@pytest.mark.asyncio
+async def test_list_nodes(injector, clean_test_session, test_nodes_structure):
+    ...
+
+
 # TODO: сериализация списка с моделями
 # json.dumps(users, default=pydantic_encoder))
 

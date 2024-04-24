@@ -9,9 +9,9 @@ class PropertyController(PropertyControllerABC,
                             ControllerMixins[
                                 PropertyDM,
                                 CreatePropertyDTO,
-                                RetrievePropertyDTO,
-                                UpdatePropertyDTO,
-                                DeletePropertyDTO]):
+                                PropertySelection,
+                                UpdatePropertiesDTO,
+                                PropertySelection]):
 
     default_service: PropertyServiceABC
 
@@ -20,9 +20,9 @@ class ManufacturerController(ManufacturerControllerABC,
                                 ControllerMixins[
                                     ManufacturerDM,
                                     CreateManufacturerDTO,
-                                    RetrieveManufacturerDTO,
+                                    ManufacturerSelection,
                                     UpdateManufacturerDTO,
-                                    DeleteManufacturerDTO]):
+                                    ManufacturerSelection]):
 
     default_service: ManufacturerServiceABC
 
@@ -31,9 +31,9 @@ class DeviceTypeController(DeviceTypeControllerABC,
                               ControllerMixins[
                                 DeviceTypeDM,
                                 CreateDeviceTypeDTO,
-                                RetrieveDeviceTypeDTO,
+                                DeviceSelection,
                                 UpdateDeviceTypeDTO,
-                                DeleteDeviceTypeDTO]):
+                                DeviceSelection]):
 
     default_service: DeviceTypeServiceABC
 
@@ -42,9 +42,9 @@ class DeviceModelController(DeviceModelControllerABC,
                                ControllerMixins[
                                 DeviceModelDM,
                                 CreateDeviceModelDTO,
-                                RetrieveDeviceModelDTO,
+                                DeviceModelSelection,
                                 UpdateDeviceModelDTO,
-                                DeleteDeviceModelDTO]):
+                                DeviceModelSelection]):
 
     default_service: DeviceModelServiceABC
 
@@ -53,8 +53,8 @@ class DeviceController(DeviceControllerABC,
                           ControllerMixins[
                             DeviceDM,
                             CreateDeviceDTO,
-                            RetrieveDeviceDTO,
+                            DeviceSelection,
                             UpdateDeviceDTO,
-                            DeleteDeviceDTO]):
+                            DeviceSelection]):
 
     default_service: DeviceServiceABC

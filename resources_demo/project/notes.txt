@@ -51,10 +51,10 @@ dict(
         disabled_fields_to_interact    =   []                           # нужно указать disabled_fields_for_filling, либо awailable_fields_for_filling, в противном случае будут доступны все поля
         response_hidden_fields         =   []                           # какие поля пользователь не может видеть
     )
-    conditions  = [                                                         # в проверку аргументом идёт policy_data, caller и dto
+    conditions  = [                                                     # в проверку аргументом идёт policy_data, caller и dto
         is_on_object,
         is_from_allowed_space,
-        is_special_user,        
+        is_special_user,
     ]
 )
 

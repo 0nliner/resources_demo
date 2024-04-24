@@ -1,8 +1,12 @@
-from enum import Enum, auto
 import datetime
-from typing import Optional, TypeVar, Generic, Union
-from pydantic import BaseModel, ConfigDict, Field, validator
-from core import ActionOnEditableMetadataMixin, CallerDTO, ReportFormats
+from typing import Optional, TypeVar
+from pydantic import Field
+from core import (CallerDTO,
+                  DateSelection,
+                  DefaultMetadataSelection,
+                  EditableMetadata,
+                  IdSelection,
+                  ReportFormats)
 
 from lib import DTOBase, Blank, DTOField
 
@@ -46,37 +50,8 @@ SubDTO_T = TypeVar("SubDTO_T")
     "payload": {}
 }
 """
-from pydantic import validator
-from lib.interfaces import Expression, OneOrMultuple, BaseSelection, Expressions
+
 T = TypeVar("T")
-
-
-# TODO: перенести в core
-class IdSelection(BaseSelection):
-    id: Expressions[int] = Blank
-
-class DateSelection(BaseSelection):
-    created_at: Expressions[datetime.datetime] = Blank
-    updated_at: Expressions[datetime.datetime] = Blank
-
-
-# TODO: сделать проверку на то, что хотя бы одно поле заполнено в конечном селекшене
-
-
-class DefaultMetadataSelection(BaseSelection):
-    name: Expressions[str] = Blank
-    description: Expressions[str] = Blank
-    comments: Expressions[str] = Blank
-
-
-
-class ImagesLinks:
-    ...
-
-
-class DocumentsLinks:
-    ...
-
 
 # ______________________________________________________________________________________
 from .models import Node
@@ -86,11 +61,6 @@ class CreateNodeDTO(DTOBase):
 
 class DeleteNodeDTO(DTOBase):
     id: Optional[int] = Field(default_factory=None)
-
-
-class UpdateNodeDTO(DTOBase):
-    parent_id: DTOField[int] = Blank
-    # children: DTOField[list[UnlinkSubs]] = Blank
 
 
 class RetrieveNodeDTO(IdSelection):
@@ -111,7 +81,7 @@ class NodesSelection(IdSelection, DateSelection, DefaultMetadataSelection):
     ...
 
 
-class UpdateNodesPayload(ActionOnEditableMetadataMixin):
+class UpdateNodesPayload(EditableMetadata):
     parent_id: DTOField[int] = Blank
     # children: DTOField[list[Union[
     #     CreateSubs[NodesSelection, CreateNodeDTO],

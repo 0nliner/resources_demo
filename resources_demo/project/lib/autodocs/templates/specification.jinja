@@ -1,0 +1,26 @@
+openapi: 3.0.0
+info:
+  title: {{ title }}
+  version: {{ version }}
+  description: {{ description }}
+
+paths:
+{% for path, methods in paths.items() %}
+  {{ path }}:
+{% for method, details in methods.items() %}
+    {{ method }}:
+      summary: {{ details.summary }}
+      description: {{ details.description }}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+              example: |
+                {
+                  "message": "Hello, World!"
+                }
+{% endfor %}
+{% endfor %}

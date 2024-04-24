@@ -11,9 +11,9 @@ from .datamappers import *
 class PropertyRepo(PropertyRepoABC,
                    RepoMixins[PropertyDM,
                               CreatePropertyDTO,
-                              RetrievePropertyDTO,
-                              UpdatePropertyDTO,
-                              DeletePropertyDTO]):
+                              PropertySelection,
+                              UpdatePropertiesDTO,
+                              PropertySelection]):
     model = Property
     session_maker: sessionmaker
 
@@ -23,9 +23,9 @@ class ManufacturerRepo(ManufacturerRepoABC,
                           RepoMixins[
                             ManufacturerDM,
                             CreateManufacturerDTO,
-                            RetrieveManufacturerDTO,
+                            ManufacturerSelection,
                             UpdateManufacturerDTO,
-                            DeleteManufacturerDTO
+                            ManufacturerSelection
                           ]):
 
     model = Manufacturer
@@ -36,9 +36,9 @@ class DeviceTypeRepo(DeviceTypeRepoABC,
                           RepoMixins[
                             DeviceTypeDM,
                             CreateDeviceTypeDTO,
-                            RetrieveDeviceTypeDTO,
+                            DeviceSelection,
                             UpdateDeviceTypeDTO,
-                            DeleteDeviceTypeDTO
+                            DeviceSelection
                           ]):
 
     model = DeviceType
@@ -49,9 +49,9 @@ class DeviceModelRepo(DeviceModelRepoABC,
                           RepoMixins[
                             DeviceModelDM,
                             CreateDeviceModelDTO,
-                            RetrieveDeviceModelDTO,
+                            DeviceModelSelection,
                             UpdateDeviceModelDTO,
-                            DeleteDeviceModelDTO
+                            DeviceModelSelection
                           ]):
 
     model = DeviceModel
@@ -62,9 +62,9 @@ class DeviceModelRepo(DeviceModelRepoABC,
 class DeviceRepo(DeviceRepoABC,
                       RepoMixins[DeviceDM,
                                     CreateDeviceDTO,
-                                    RetrieveDeviceDTO,
+                                    DeviceSelection,
                                     UpdateDeviceDTO,
-                                    DeleteDeviceDTO]):
+                                    DeviceSelection]):
 
     model = Device
     session_maker: sessionmaker
