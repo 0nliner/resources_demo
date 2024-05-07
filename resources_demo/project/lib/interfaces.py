@@ -12,7 +12,7 @@ from archtool.layers.default_layer_interfaces import ABCController
 from archtool.dependecy_injector import DependecyInjector
 
 from exceptions import NotExist
-from pydantic import TypeAdapter
+from pydantic import TypeAdapter, Field
 
 
 TT = typing.TypeVar("TT", bound=BaseModel)
@@ -57,12 +57,20 @@ T = typing.TypeVar("T")
 DTOField = typing.Union[typing.Optional[T], Blank]
 OneOrMultuple = typing.Union[T, list[T]]
 
-class DTOBase(BaseModel):
+from typing import ClassVar, Optional, Union
+
+
+class PydanticWrapper(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @property
     def not_blank(self):
         return {key: value for key, value in vars(self).items() if value is not Blank}
+
+class DTOBase(PydanticWrapper):
+    selection: ClassVar[Optional['BaseSelection']] = None
+    payload: ClassVar[Optional['DTOBase']] = None
+
 
 class DMBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -75,7 +83,7 @@ class PaginationInfo(BaseModel):
     page_start: int = 0
 
 
-class BaseSelection(DTOBase):
+class BaseSelection(PydanticWrapper):
     def __init__(self, **data):
         prepared_data = {}
         for key, value in data.items():
@@ -87,7 +95,6 @@ class BaseSelection(DTOBase):
             new_expr = Expression(raw_expression=key, value=value)
             field_expressions.append(new_expr)
         super().__init__(**prepared_data)
-
 
 
 class FilterDTOABC:
@@ -157,12 +164,15 @@ def sql_from_expr(expr: 'Expression',
 
 
 ExprT = typing.TypeVar("ExprT")
+from typing import ClassVar, Optional
 
 
 class Expression(typing.Generic[ExprT], DTOBase):
     expression_type: OperationTypes
     field_name: str
     value: ExprT
+    # TODO: сделать проброс oper_types в build_where_expr
+    oper_types: ClassVar[OperationTypes] = OperationTypes
 
     def __init__(self, raw_expression: str, value: ExprT):
         field_name, expression_type = parse_query_string(raw_expression)
@@ -532,6 +542,15 @@ from aiohttp import web_app, web
 from aiohttp.web_request import Request as AIOHTTP_REQUEST
 from aiohttp.web_response import Response as AIOHTTP_RESPONSE
 
+PYTHON_TO_OPENAPI_TYPES_MAPPING = {
+        str: "string",
+        int: "integer",
+        bool: "boolean",
+        float: "float",
+        # TODO: добавить форматирование для типов
+        datetime.datetime: "string"
+    }
+
 
 def json_encoder(*args, **kwargs):
     def encoder(obj):
@@ -725,16 +744,36 @@ class RequestTypes(Enum):
 
 
 def tab_block(string: str, num_tabs=1):
-    string = ("\n" + string).replace("\n", "\n" + (num_tabs * "\t"))
+    string = ("\n" + string).replace("\n", "\n" + (num_tabs * "  "))
     return string
+
+
+import re
+
+@dataclass
+class Parameter:
+    position: str
+    name: str
+    type: str
+    required: bool
+
 
 @dataclass
 class OpenApiEndpoint:
+    section_name: str
     endpoint: typing.Callable
     uri: str
     request_type: RequestTypes
-    dto: BaseModel
-    dm: BaseModel
+    dto: DTOBase
+    dm: DMBase
+    parameters: list[Parameter]
+
+    @property
+    def path_parameters(self):
+        pattern = r"\{([a-zA-Z]+).*\}"
+        matches = re.findall(pattern, self.uri)
+        return matches
+
 
 from pydantic.fields import FieldInfo
 from pydantic._internal._model_construction import ModelMetaclass
@@ -761,17 +800,11 @@ def get_dto_and_dm(method: typing.Callable) -> tuple[BaseModel, BaseModel]:
         return method_dto, method_dm
 
 
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, select_autoescape
 
 
 class ArchtoolsOpenApiGenerator:
     DTO_BASE = BaseModel
-    TYPES_MAPPING = {
-        str: "string",
-        int: "integer",
-        bool: "boolean",
-        float: "float"
-    }
 
     def __init__(self, injector: DependecyInjector, uri_prefix: str = "/api/"):
         self.injector = injector
@@ -781,14 +814,26 @@ class ArchtoolsOpenApiGenerator:
         self.uri_prefix = uri_prefix
         self._process_after = {}
 
+
+        from jinja2 import FileSystemLoader
+
         self.env = Environment(
-            loader=PackageLoader(".autodocs"),
+            loader=FileSystemLoader(pathlib.Path(__file__).parent / "templates"),
             autoescape=select_autoescape()
         )
 
-
-    def generate_openapi_model(self, model: BaseModel) -> str:
-        fields = model.model_fields
+    def generate_openapi_model(self, model: Union[DTOBase, DMBase]) -> str:
+        if issubclass(model, DMBase):
+            fields = model.model_fields
+        elif issubclass(model, DTOBase):
+            if "payload" in model.model_fields:
+                fields = model.model_fields['payload'].annotation.model_fields
+            else:
+                # временное условие
+                fields = model.model_fields
+        else:
+            raise
+        
         fields_rendered = ""
         required_fields_names = []
         for name, field in fields.items():
@@ -797,26 +842,98 @@ class ArchtoolsOpenApiGenerator:
             if is_field_required:
                 required_fields_names.append(name) 
 
-        required_rendered = "".join(" - " + e for e in required_fields_names)
+        required_rendered = "\n".join(" - " + e for e in required_fields_names)
         if required_rendered:
-            required_rendered = "required:\n" + required_rendered
-        rendered = f"type: object\n{required_rendered}\nproperties:{tab_block(fields_rendered)}"
+            required_rendered = tab_block("required:\n" + tab_block(required_rendered), num_tabs=3)
+        properties = tab_block(f"properties:{tab_block(fields_rendered)}", num_tabs=3)
+        rendered = f"type: object\n{required_rendered}\n{properties}"
         return rendered
 
     def _render_object_property_field(self, field_name: str, field: FieldInfo, model: BaseModel) -> tuple[str, bool]:
-        field_annotation = model.__annotations__[field_name]
-        is_required = not (hasattr(field_annotation, "_name") and field_annotation._name == "Optional")
-        _type = field_annotation.__args__[0] if hasattr(field_annotation, "__args__") else field_annotation
-        if issubclass(type(_type), ModelMetaclass):
-            # TODO:
-            # self.get_ref_on_model(_type)
-            return "", False
-        else:
-            rendered = f"{field_name}:\n\ttype: {self.TYPES_MAPPING[_type]}"
-            return rendered, is_required
+        # лютый ХАРДКОД
+        property_field_template = self.env.get_template("property_field.jinja2")
+        is_expression = "Expression" in str(field.annotation)
+        is_ref = inspect.isclass(field.annotation) and issubclass(field.annotation, BaseModel)
+        
+        if is_ref:
+            if field.annotation not in self.dtos:
+                dto_code = self.generate_openapi_model(field.annotation)
+                self.dtos.update({field.annotation: dto_code})
+            return f"{field_name}:\n  $ref: '#/components/schemas/{field.annotation.__name__}'", True
 
-    def get_ref_on_model(self, model: BaseModel):
-        ...
+        elif is_expression:
+            raise Exception("expression can not be defined in payload")
+            # если зааннотировано как экспрешены (либо как подклассы экспрешеннов)
+            # парсим как множество различных полей.
+            # вытаскиваем все операторы из связанных с экспрешенном
+            # отображаем каждый возможный экспрешн
+            # expr_annotation: Expression = field.annotation.__args__[0]
+            # _type = expr_annotation.__args__[0]
+            # openapi_type = PYTHON_TO_OPENAPI_TYPES_MAPPING[_type]
+            # is_required = not (Blank in field.annotation.__args__)
+            # rendered = ""
+            # for available_oper in expr_annotation.oper_types:
+                # field_rendered = property_field_template.render(type=openapi_type,
+                                                                # field_name=f"{field_name}_{available_oper.value.replace('__', '')}")
+                # rendered += "\n" + field_rendered
+            # return rendered, is_required
+
+        # если тип не DTOField[OneOrMultuple[...]] с Expression[T]
+        else:
+            field_annotation = field.annotation
+            is_required = not (hasattr(field_annotation, "_name") and field_annotation._name == "Optional")
+            _type = field_annotation.__args__[0] if hasattr(field_annotation, "__args__") else field_annotation
+            if issubclass(type(_type), ModelMetaclass):
+                # TODO:
+                # self.get_ref_on_model(_type)
+                return "", False
+            else:
+                rendered = f"{field_name}:\n  type: {PYTHON_TO_OPENAPI_TYPES_MAPPING[_type]}"
+                return rendered, is_required
+
+
+    def parse_parameters(self, dto: Union[DTOBase, BaseSelection]) -> list[Parameter]:
+        results = []
+        if issubclass(dto, DTOBase):
+            if not 'selection' in dto.model_fields:
+                return []
+            else:
+                fields = dto.model_fields['selection'].annotation.model_fields
+        elif issubclass(dto, BaseSelection):
+            fields = dto.model_fields
+        else:
+            raise
+
+        for param_name, field in fields.items():
+            is_expression = "Expression" in str(field.annotation)
+            is_ref = inspect.isclass(field.annotation) and issubclass(field.annotation, BaseSelection)
+
+            if is_ref:
+                if field.annotation not in self.dtos:
+                    results.extend(self.parse_parameters(field.annotation))
+
+            elif is_expression:
+                # если зааннотировано как экспрешены (либо как подклассы экспрешеннов)
+                # парсим как множество различных полей.
+                # вытаскиваем все операторы из связанных с экспрешенном
+                # отображаем каждый возможный экспрешн
+                expr_annotation: Expression = field.annotation.__args__[0]
+                _type = expr_annotation.__args__[0]
+                for available_oper in expr_annotation.oper_types:
+                    new_param = Parameter(type=PYTHON_TO_OPENAPI_TYPES_MAPPING[_type],
+                                          name=f"{param_name}_{available_oper.value.replace('__', '')}",
+                                          required=False,
+                                          position="query")
+                    results.append(new_param)
+            else:
+                is_param_required = "NoneType" in str(field.annotation) # >.<
+                param_type = field.annotation.__args__[0] if field.annotation.__args__ else field.annotation
+                new_param = Parameter(name=param_name,
+                                      position="path",
+                                      type=PYTHON_TO_OPENAPI_TYPES_MAPPING[param_type],
+                                      required=is_param_required)
+                results.append(new_param)
+        return results
 
     def generate_openapi(self, dest_file: pathlib.Path):
         # инициализация базовых папок
@@ -833,8 +950,8 @@ class ArchtoolsOpenApiGenerator:
 
         # генерация
         controllers = get_api_controllers(self.injector)        
+        paths = {}
         for controller in controllers:
-            new_controller_name = resolve_controller_name(controller=controller)
             for method_name, method in get_controller_methods(controller).items():
                 operation_id = method_name
                 method_type = resolve_endpoint_method_type(method=method)
@@ -842,19 +959,39 @@ class ArchtoolsOpenApiGenerator:
                 uri = resolve_uri(method=method, controller=controller, method_type=method_type)
 
                 dto, dm = get_dto_and_dm(method)
-                if dto not in self.dtos:
+                parameters = self.parse_parameters(dto)
+                if dto not in self.dtos and not issubclass(dto, BaseSelection):
                     dto_code = self.generate_openapi_model(dto)
                     self.dtos.update({dto: dto_code})
+                else:
+                    dto = None
+                if dm not in self.dtos:
+                    dm_code = self.generate_openapi_model(dm)
+                    self.dtos.update({dm: dm_code})
 
-                openapi_endpoint = OpenApiEndpoint(endpoint=method,
+
+                openapi_endpoint = OpenApiEndpoint(section_name=resolve_controller_name(controller),
+                                                   endpoint=method,
                                                    uri=uri,
                                                    request_type=method_type.value,
                                                    dto=dto,
-                                                   dm=dm)
+                                                   dm=dm,
+                                                   parameters=parameters)
 
-                self.endpoints.append(openapi_endpoint)
+                # self.endpoints.append(openapi_endpoint)
+                if openapi_endpoint.uri in paths:
+                    paths[openapi_endpoint.uri].append(openapi_endpoint)
+                else:
+                    paths.update({openapi_endpoint.uri: [openapi_endpoint]})
 
-
+        specification_template = self.env.get_template("specification.jinja")
+        rendered = specification_template.render(paths=paths,
+                                                 components=self.dtos,
+                                                 title="",
+                                                 version="",
+                                                 description="",
+                                                 type=type)
+        return rendered
 
 
 class ArchtoolsGrpcGenerator:

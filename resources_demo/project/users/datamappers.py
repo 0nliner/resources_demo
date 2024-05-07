@@ -1,17 +1,17 @@
-from pydantic import BaseModel
+from lib.interfaces import DMBase
 
 
-class SSOUserDM(BaseModel):
+class SSOUserDM(DMBase):
     id: int
     username: str
     phone_number: str
     email: str
 
 
-class InnerUserDM(BaseModel):
+class InnerUserDM(DMBase):
     id: int
 
 
-class UserDM(BaseModel):
+class UserDM(DMBase):
     sso_user_data: SSOUserDM
     inner_user_data: InnerUserDM

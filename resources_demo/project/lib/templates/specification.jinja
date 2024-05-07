@@ -1,0 +1,46 @@
+openapi: 3.0.0
+info:
+  title: {{ title }}
+  version: {{ version }}
+  description: {{ description }}
+
+paths:
+{% for path, methods in paths.items() %}
+  /{{ path }}:
+{% for method in methods %}
+    {{ method.request_type }}:
+      tags:
+        - {{ method.section_name }}
+      {% if method.parameters %}
+      parameters:
+      {% for parameter in method.parameters %}
+      - in: {{ parameter.position }}
+        name: {{ parameter.name }}
+        schema:
+          type: {{ parameter.type }}
+      {% endfor %}
+      {% endif %}
+      {% if method.dto %}
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/{{method.dto.__name__}}"
+      {% endif %}
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{{method.dm.__name__}}"
+
+{% endfor %}
+{% endfor %}
+
+components:
+  schemas:
+    {% for component, component_code in components.items() %}
+    {{ component.__name__ }}:
+      {{component_code}}
+    {% endfor %}

@@ -2,9 +2,9 @@ from typing import Optional
 import datetime
 from uuid import UUID
 from pydantic import BaseModel
+from lib.interfaces import DMBase
 
-
-class ServiceDM(BaseModel):
+class ServiceDM(DMBase):
     id: UUID
     title: str
     short_description: str
@@ -27,7 +27,7 @@ class ServiceDM(BaseModel):
     #   residences: list[UUID]
 
 
-class ServiceCategoryDM(BaseModel):
+class ServiceCategoryDM(DMBase):
     id: UUID
     title: Optional[str]
     is_active: Optional[bool]

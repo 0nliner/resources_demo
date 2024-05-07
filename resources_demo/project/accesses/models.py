@@ -35,3 +35,12 @@ class Policy(Base):
     # response_hidden_fields: Mapped[list[str]]
     policy: Mapped[dict] = mapped_column(JSON, nullable=True)
     conditions: Mapped[list[str]] = mapped_column(STR_ARR)
+
+
+class Rule(Base):
+    __tablename__ = "rules"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    is_relevant_functions: Mapped[list[str]] = mapped_column(STR_ARR)
+    is_allowed_functions: Mapped[list[str]] = mapped_column(STR_ARR)
+    restriction_functions: Mapped[list[str]] = mapped_column(STR_ARR)

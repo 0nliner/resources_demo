@@ -20,6 +20,6 @@ class NodesRepo(NodesRepoABC,
                            NodesSelection]):
     model = Node
     session_maker: sessionmaker
-    
+
     # async def upload_image(self, data: UploadImageDTO) -> ImageDM:
     #     ...

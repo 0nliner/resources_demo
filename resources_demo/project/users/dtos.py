@@ -16,11 +16,11 @@ class RetrieveInnerUserDTO(DTOBase):
 
 
 class UpdateInnerUserDTO(DTOBase):
-    ...
+    example: str
 
 
 class DeleteInnerUserDTO(DTOBase):
-    ...
+    example: str
 
 
 # SSO

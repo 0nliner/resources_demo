@@ -43,7 +43,7 @@ class UpdateDeviceDTO(DTOBase):
 
 
 class UpdateManufacturerPayload(BaseModel):
-    ...
+    example: str
 
 
 class UpdateManufacturerDTO(DTOBase):
@@ -52,7 +52,7 @@ class UpdateManufacturerDTO(DTOBase):
 
 
 class UpdateDeviceTypePayload(BaseModel):
-    ...
+    example: str
 
 
 class UpdateDeviceTypeDTO(DTOBase):
@@ -61,7 +61,7 @@ class UpdateDeviceTypeDTO(DTOBase):
 
 
 class UpdateDeviceModelPayload(BaseModel):
-    ...
+    example: str
 
 
 class UpdateDeviceModelDTO(DTOBase):
@@ -78,13 +78,13 @@ class CreateDeviceDTO(EditableMetadata, BaseModel):
 
 
 class CreateManufacturerDTO(DTOBase):
-    ...
+    example: str
 
 
 class CreateDeviceTypeDTO(DTOBase):
-    ...
+    example: str
 
 
 
 class CreateDeviceModelDTO(DTOBase):
-    ...
+    example: str

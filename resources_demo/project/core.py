@@ -2,7 +2,7 @@ from typing import Optional
 from enum import auto, Enum
 from datetime import datetime
 
-from sqlalchemy import ARRAY, String
+from sqlalchemy import ARRAY, JSON, String
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column
 
 from pydantic import BaseModel
@@ -67,6 +67,11 @@ class DefaultMetadataSelection(BaseSelection):
 from sqlalchemy import DateTime
 
 
+class Denormalized(Base):
+    __abstract__ = True
+    extra: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+
+
 class ImagesLinks(Base):
     __abstract__ = True
     images: Mapped[Optional[list[str]]] = mapped_column(ARRAY(String(100)), nullable=True)
@@ -87,5 +92,4 @@ class DefautMetadata(Dates):
     __abstract__ = True
     name: Mapped[Optional[str]] = mapped_column(String(128))
     description: Mapped[Optional[str]] = mapped_column(String(1024))
-    # extra: Mapped[JSONB] = mapped_column(nullable=True)
     comments: Mapped[Optional[str]] = mapped_column(nullable=True)

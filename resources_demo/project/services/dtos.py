@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 from uuid import UUID
 
-from lib import DTOBase
+from lib import DTOBase, Blank
 
 # class CreateServiceCategoryDTO(DTOBase):
 #     id
@@ -33,15 +33,15 @@ class RetieveServiceDTO(DTOBase):
     id: int
 
 
-class UpdateServicePayload(BaseModel):
-    title: Optional[str]
-    short_description: Optional[str]
-    long_description: Optional[str]
-    service_category: Optional[UUID]
-    is_active: Optional[bool]
-    is_internal: Optional[bool]
-    image_url: Optional[str]
-    image_thumbnail_url: Optional[str]
+class UpdateServicePayload(DTOBase):
+    title: Optional[str] = Blank
+    short_description: Optional[str] = Blank
+    long_description: Optional[str] = Blank
+    service_category: Optional[UUID] = Blank
+    is_active: Optional[bool] = Blank
+    is_internal: Optional[bool] = Blank
+    image_url: Optional[str] = Blank
+    image_thumbnail_url: Optional[str] = Blank
 
 
 class UpdateServiceDTO(DTOBase):
@@ -64,7 +64,7 @@ class RetrieveServiceCategoryDTO(DTOBase):
     id: int
 
 
-class UpdateServiceCategoryPayload(BaseModel):
+class UpdateServiceCategoryPayload(DTOBase):
     title: Optional[str]
     is_active: Optional[bool]
     icon_tag: Optional[str]

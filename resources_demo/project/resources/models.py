@@ -3,13 +3,13 @@ from typing import Optional, TYPE_CHECKING
 from sqlalchemy import ForeignKey, String, case
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from core import Base, ImagesLinks, DefautMetadata, DocumentsLinks
+from core import ImagesLinks, DefautMetadata, DocumentsLinks, Denormalized
 
 if TYPE_CHECKING:
     from devices.models import Property
 
 
-class Node(ImagesLinks, DefautMetadata, DocumentsLinks):
+class Node(ImagesLinks, DefautMetadata, DocumentsLinks, Denormalized):
     __tablename__ = 'nodes'
 
     id: Mapped[int] = mapped_column(primary_key=True)

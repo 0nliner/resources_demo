@@ -5,7 +5,7 @@ from core import EditableMetadataDM
 from lib.interfaces import DMBase
 
 
-class NodesDM(BaseModel):
+class NodesDM(DMBase):
     ...
 
 
@@ -14,7 +14,7 @@ class NodeDM(EditableMetadataDM, DMBase):
     parent_id: Optional[int] = None
 
 
-class ImageDM(BaseModel):
+class ImageDM(DMBase):
     id: str
 
     @property

@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import ForeignKey, String, case
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from core import Base, ImagesLinks, DocumentsLinks, DefautMetadata
+from core import Base, Denormalized, ImagesLinks, DocumentsLinks, DefautMetadata
 
 if typing.TYPE_CHECKING:
     from resources.models import Node
@@ -72,7 +72,7 @@ if typing.TYPE_CHECKING:
 # (Base)
 
 
-class Property(DefautMetadata, ImagesLinks, DocumentsLinks):
+class Property(DefautMetadata, ImagesLinks, DocumentsLinks, Denormalized):
     """
     объект имущества
     """
@@ -92,19 +92,19 @@ class Property(DefautMetadata, ImagesLinks, DocumentsLinks):
     node: Mapped['Node'] = relationship('Node', back_populates="properties")
 
 
-class Manufacturer(DefautMetadata):
+class Manufacturer(DefautMetadata, Denormalized):
     __tablename__ = "manufacturers"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
 
-class DeviceType(DefautMetadata):
+class DeviceType(DefautMetadata, Denormalized):
     __tablename__ = 'device_types'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
 
 
-class DeviceModel(DefautMetadata, ImagesLinks):
+class DeviceModel(DefautMetadata, ImagesLinks, Denormalized):
     __tablename__ = "device_models"
 
     id: Mapped[int] = mapped_column(primary_key=True)

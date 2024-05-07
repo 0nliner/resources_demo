@@ -43,7 +43,7 @@ class DeviceTypeRepo(DeviceTypeRepoABC,
 
     model = DeviceType
     session_maker: sessionmaker
-    
+
 
 class DeviceModelRepo(DeviceModelRepoABC,
                           RepoMixins[

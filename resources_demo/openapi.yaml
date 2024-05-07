@@ -1,0 +1,3282 @@
+openapi: 3.0.0
+info:
+  title: a
+  version: b 
+  description: c
+
+paths:
+
+  /nodes:
+
+    post:
+      tags:
+        - nodes
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNodeDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NodeDM"
+
+
+    patch:
+      tags:
+        - nodes
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNodesDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NodeDM"
+
+
+
+  /nodes/{id:\d+}:
+
+    delete:
+      tags:
+        - nodes
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NodeDM"
+
+
+    get:
+      tags:
+        - nodes
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NodeDM"
+
+
+
+  /user:
+
+    post:
+      tags:
+        - user
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInnerUserDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InnerUserDM"
+
+
+    patch:
+      tags:
+        - user
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateInnerUserDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InnerUserDM"
+
+
+
+  /user/{id:\d+}:
+
+    delete:
+      tags:
+        - user
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeleteInnerUserDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InnerUserDM"
+
+
+    get:
+      tags:
+        - user
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RetrieveInnerUserDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InnerUserDM"
+
+
+
+  /property:
+
+    post:
+      tags:
+        - property
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePropertyDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyDM"
+
+
+    patch:
+      tags:
+        - property
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePropertiesDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyDM"
+
+
+
+  /property/{id:\d+}:
+
+    delete:
+      tags:
+        - property
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyDM"
+
+
+    get:
+      tags:
+        - property
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyDM"
+
+
+
+  /manufacturer:
+
+    post:
+      tags:
+        - manufacturer
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateManufacturerDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManufacturerDM"
+
+
+    patch:
+      tags:
+        - manufacturer
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateManufacturerDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManufacturerDM"
+
+
+
+  /manufacturer/{id:\d+}:
+
+    delete:
+      tags:
+        - manufacturer
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManufacturerDM"
+
+
+    get:
+      tags:
+        - manufacturer
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManufacturerDM"
+
+
+
+  /device_type:
+
+    post:
+      tags:
+        - device_type
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeviceTypeDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceTypeDM"
+
+
+    patch:
+      tags:
+        - device_type
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeviceTypeDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceTypeDM"
+
+
+
+  /device_type/{id:\d+}:
+
+    delete:
+      tags:
+        - device_type
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceTypeDM"
+
+
+    get:
+      tags:
+        - device_type
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceTypeDM"
+
+
+
+  /device_model:
+
+    post:
+      tags:
+        - device_model
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeviceModelDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceModelDM"
+
+
+    patch:
+      tags:
+        - device_model
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeviceModelDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceModelDM"
+
+
+
+  /device_model/{id:\d+}:
+
+    delete:
+      tags:
+        - device_model
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceModelDM"
+
+
+    get:
+      tags:
+        - device_model
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceModelDM"
+
+
+
+  /device:
+
+    post:
+      tags:
+        - device
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeviceDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceDM"
+
+
+    patch:
+      tags:
+        - device
+      
+      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDeviceDTO"
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceDM"
+
+
+
+  /device/{id:\d+}:
+
+    delete:
+      tags:
+        - device
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceDM"
+
+
+    get:
+      tags:
+        - device
+      
+      parameters:
+      
+      - in: query
+        name: name_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: name_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: name_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: name_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: description_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: description_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: description_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: comments_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: created_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_gte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lte
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_lt
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_eq
+        schema:
+          type: string
+      
+      - in: query
+        name: updated_at_in_
+        schema:
+          type: string
+      
+      - in: query
+        name: id_gt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_gte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lte
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_lt
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_eq
+        schema:
+          type: integer
+      
+      - in: query
+        name: id_in_
+        schema:
+          type: integer
+      
+      
+      
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceDM"
+
+
+
+
+components:
+  schemas:
+    
+    CreateNodeDTO:
+      type: object
+
+
+      properties:
+        parent_id:
+          type: integer
+        
+    
+    NodeDM:
+      type: object
+
+      required:
+      
+         - id
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        id:
+          type: integer
+        parent_id:
+          type: integer
+        
+    
+    UpdateNodesDTO:
+      type: object
+
+      required:
+      
+         - name
+         - description
+         - extra
+         - comments
+         - parent_id
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        parent_id:
+          type: integer
+        
+    
+    CreateInnerUserDTO:
+      type: object
+
+      required:
+      
+         - id
+
+      properties:
+        id:
+          type: integer
+        
+    
+    InnerUserDM:
+      type: object
+
+      required:
+      
+         - id
+
+      properties:
+        id:
+          type: integer
+        
+    
+    DeleteInnerUserDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    RetrieveInnerUserDTO:
+      type: object
+
+      required:
+      
+         - id
+         - role_id
+         - role
+
+      properties:
+        id:
+          type: integer
+        role_id:
+          type: integer
+        role:
+          type: string
+        
+    
+    UpdateInnerUserDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    CreatePropertyDTO:
+      type: object
+
+      required:
+      
+         - name
+         - description
+         - extra
+         - comments
+         - node_id
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        node_id:
+          type: integer
+        
+    
+    PropertyDM:
+      type: object
+
+      required:
+      
+         - name
+         - description
+         - extra
+         - comments
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        device_id:
+          type: integer
+        node_id:
+          type: integer
+        
+    
+    UpdatePropertiesDTO:
+      type: object
+
+      required:
+      
+         - name
+         - description
+         - extra
+         - comments
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        node_id:
+          type: integer
+        device_id:
+          type: integer
+        
+    
+    CreateManufacturerDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    ManufacturerDM:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    UpdateManufacturerDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    CreateDeviceTypeDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    DeviceTypeDM:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    UpdateDeviceTypeDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    CreateDeviceModelDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    DeviceModelDM:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    UpdateDeviceModelDTO:
+      type: object
+
+      required:
+      
+         - example
+
+      properties:
+        example:
+          type: string
+        
+    
+    CreateDeviceDTO:
+      type: object
+
+      required:
+      
+         - name
+         - description
+         - extra
+         - comments
+         - property_id
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        property_id:
+          type: integer
+        
+    
+    DeviceDM:
+      type: object
+
+
+      properties:
+        device_model_id:
+          type: integer
+        property_id:
+          type: integer
+        icon_tag:
+          type: string
+        
+    
+    UpdateDeviceDTO:
+      type: object
+
+      required:
+      
+         - name
+         - description
+         - extra
+         - comments
+
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extra:
+          type: string
+        comments:
+          type: string
+        
+    
