@@ -57,7 +57,7 @@ T = typing.TypeVar("T")
 DTOField = typing.Union[typing.Optional[T], Blank]
 OneOrMultuple = typing.Union[T, list[T]]
 
-from typing import ClassVar, Optional, Union
+from typing import Any, ClassVar, Optional, Type, Union
 
 
 class PydanticWrapper(BaseModel):
@@ -780,7 +780,7 @@ from pydantic._internal._model_construction import ModelMetaclass
 
 
 # немного хардкода с аннотированием возвращаемого значения
-def get_dto_and_dm(method: typing.Callable) -> tuple[BaseModel, BaseModel]:
+def get_dto_and_dm(method: typing.Callable) -> tuple[Type[DTOBase], Type[DMBase]]:
     original_class = find_method_origin(type(method.__self__), method.__name__)
     is_generic_method = original_class is ControllerMixins
     
@@ -800,7 +800,7 @@ def get_dto_and_dm(method: typing.Callable) -> tuple[BaseModel, BaseModel]:
         return method_dto, method_dm
 
 
-from jinja2 import Environment, select_autoescape
+from jinja2 import Environment, select_autoescape, FileSystemLoader
 
 
 class ArchtoolsOpenApiGenerator:
@@ -813,9 +813,6 @@ class ArchtoolsOpenApiGenerator:
         self.dms = {}
         self.uri_prefix = uri_prefix
         self._process_after = {}
-
-
-        from jinja2 import FileSystemLoader
 
         self.env = Environment(
             loader=FileSystemLoader(pathlib.Path(__file__).parent / "templates"),
@@ -953,7 +950,6 @@ class ArchtoolsOpenApiGenerator:
         paths = {}
         for controller in controllers:
             for method_name, method in get_controller_methods(controller).items():
-                operation_id = method_name
                 method_type = resolve_endpoint_method_type(method=method)
                 is_method_detailed = resolve_endpoint_detailed(method, method_type=method_type)
                 uri = resolve_uri(method=method, controller=controller, method_type=method_type)
@@ -999,5 +995,181 @@ class ArchtoolsGrpcGenerator:
         ...
 
 
-class ArchtoolsClientLibGenerator:
-    ...
+class ABCSender(ABC):
+
+    @abstractmethod
+    async def send(self, data: DTOBase) -> DMBase:
+        raise NotImplementedError("Send method is not implemented!")
+
+
+from aiohttp import ClientSession
+import builtins
+
+class AiohttpSender(ABCSender):
+    client: ClientSession
+
+    async def get_query_params(self, dto: DTOBase) -> Optional[dict[str, Any]]:
+        result = {}
+
+        return None if not result else result
+
+    async def get_body(self, dto: DTOBase) -> Optional[dict[str, Any]]:
+        result = {}
+
+        return None if not result else result
+
+    async def send(self,
+                   data: DTOBase,
+                   request_method: RequestTypes,
+                   uri: str) -> DMBase:
+        method = getattr(self.client, request_method.value)
+        query_params = self.get_query_params(data)
+        body = self.get_body(data)
+        request_data = dict(params=query_params, body=body)
+
+        async with method(uri, **request_data) as response:
+            response
+
+
+BUILTINS = list(vars(builtins).values())
+from dataclasses import field
+
+@dataclass
+class ClientRepo:
+    name: str
+    methods: list['ClientRepoMethod'] = field(default_factory=list)
+
+    @property
+    def interface_name(self) -> str:
+        return self.name + "ABC"
+
+
+@dataclass
+class ClientRepoMethod:
+    name: str
+    uri: str
+    dto_name: str
+    dm_name: str
+
+
+@dataclass
+class Folder:
+    path: pathlib.Path
+    files: list['File'] = field(default_factory=list)
+
+    def create_all(self) -> None:
+        try:
+            self.path.rmdir()
+        except Exception:
+            ...
+        self.path.mkdir()
+        for _file in self.files:
+            _file.create()
+
+
+@dataclass
+class File:
+    parent: Folder
+    name: pathlib.Path
+    content: str
+
+    @property
+    def file_path(self) -> pathlib.Path:
+        return self.parent.path / self.name
+
+    def create(self) -> None:
+        self.file_path.touch()
+        self.file_path.write_text(self.content)
+
+
+class ArchtoolsClientLibBuilder:
+    def __init__(self, injector: DependecyInjector):
+        self.injector = injector
+        self.env = Environment(
+            loader=FileSystemLoader(pathlib.Path(__file__).parent / "templates"),
+            autoescape=select_autoescape())
+
+    def generate_interface_from_component(self, component: ClientRepo):
+        ...
+
+    def generate_client_lib(self,
+                            dest_folder: pathlib.Path,
+                            sender: Type[ABCSender] = AiohttpSender) -> Folder:
+
+        dtos: dict[DTOBase, Optional[str]] = {}
+        dto_dependencies: set[str] = set()
+
+        datamappers: dict[DMBase, Optional[str]] = {}
+        dm_dependencies: set[str] = set()
+
+        repositories: ClientRepo = []
+        repo_interfaces = []
+
+        for controller in get_api_controllers(self.injector):
+            repository_name = type(controller).__name__.replace("Controller", "Repo")
+            repo_methods = []
+            for method_name, method in get_controller_methods(controller).items():
+                method_type = resolve_endpoint_method_type(method=method)
+                uri = resolve_uri(method=method, controller=controller, method_type=method_type)
+
+                dto, dm = get_dto_and_dm(method)
+                if not dto in dtos:
+                    dto_code = inspect.getsource(dto)
+                    dtos.update({dto: dto_code})
+                    deps = self.get_object_dependencies(dto)
+                    dto_dependencies = dto_dependencies.union(deps)
+
+                if not dm in datamappers:
+                    dm_code = inspect.getsource(dm)
+                    datamappers.update({dm: dm_code})
+                    deps = self.get_object_dependencies(dm)
+                    dm_dependencies = dm_dependencies.union(deps)
+
+                new_method = ClientRepoMethod(name=method_name,
+                                              uri=uri,
+                                              dm_name=dm.__name__,
+                                              dto_name=dto.__name__)
+                repo_methods.append(new_method)
+
+            client_repo = ClientRepo(name=repository_name,
+                                     methods=repo_methods)
+            repo_interface = self.generate_interface_from_component(client_repo)
+            repo_interfaces.append(repo_interface)
+            repositories.append(client_repo)
+        
+        dto_file_content = ""
+        dm_file_content = ""
+        repos_file_content = ""
+        interfaces_file_content = ""
+
+        dto_template = self.env.get_template("client_lib/dtos.jinja")
+        repos_template = self.env.get_template("client_lib/repos.jinja")
+        # TODO:
+        # self.env.get_template("client_lib/interfaces.jinja")
+
+        dto_file_content = dto_template.render(dependencies=dto_dependencies,
+                                               dtos=dtos)
+
+        dm_file_content = dto_template.render(dependencies=dm_dependencies,
+                                              dtos=datamappers)
+
+        repos_file_content = repos_template.render(repo_deps=[],
+                                                   repos=repositories)
+
+        root_folder = Folder(path=dest_folder)
+        root_folder.files = [File(parent=root_folder, name="interfaces.py", content=interfaces_file_content),
+                             File(parent=root_folder, name="repos.py", content=repos_file_content),
+                             File(parent=root_folder, name="dms.py", content=dm_file_content),
+                             File(parent=root_folder, name="dtos.py", content=dto_file_content)]
+        return root_folder
+
+
+    def get_object_dependencies(self, obj: Union[DTOBase, DMBase]) -> set[str]:
+        object_deps = set()
+        for name, annotation in obj.__annotations__.items():
+            if not type(annotation) in BUILTINS:
+                dep_module = annotation.__module__
+                dep_name = annotation.__name__
+                dep_import_string = f"from {dep_module} import {dep_name}"    # для typing.Option неправильно формируется строка
+                object_deps.add(dep_import_string)                            # так же мы не смотрим на классы, от которых наследуемся, хотя надо !
+        return object_deps

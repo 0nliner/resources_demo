@@ -1,0 +1,24 @@
+{% for import_string in repo_deps%}
+{{import_string}}
+{% endfor %}
+
+from .internals import ABCSender
+from .interfaces import *
+from .dtos import *
+from .datamappers import *
+
+
+{% for repo in repos %}
+class {{repo.name}}({{repo.interface_name}}):
+    sender: ABCSender
+    serialize: ABCSerialize
+
+    {% for method in repo.methods %}
+    async def {{ method.name }}(self, data: {{method.dto_name}}) -> {{method.dm_name}}:
+        raw_result = await self.sender.send(prefix={{prefix}},
+                                            uri="{{method.uri}}",
+                                            data=data)
+        result = self.serialize(raw_result)
+        return raw_result
+    {% endfor %}
+{% endfor %}
